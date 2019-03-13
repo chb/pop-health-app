@@ -58,7 +58,7 @@ export default class SQLEditor extends React.Component
             let height = $editor.css({ overflow: "hidden" }).height();
             $window.on("mouseup.resize", () => {
                 $editor.css({ overflow: "visible" });
-                this.props.onHeightChange($editor.height());
+                this.props.onHeightChange($editor.outerHeight());
                 $window.off(".resize");
             });
             $window.on("mousemove.resize", moveEvent => {
