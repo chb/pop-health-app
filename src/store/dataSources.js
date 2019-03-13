@@ -21,39 +21,22 @@ const INITIAL_STATE = {
     }
 };
 
+const TOGGLE = "actions:data-source:toggle";
+
 export function toggleDataSource(id)
 {
-    return { type: "TOGGLE_DATA_SOURCE", payload: id };
-}
-
-export function setDataSourceEnabled(id, bEnabled)
-{
-    return {
-        type: "SET_DATA_SOURCE_ENABLED",
-        payload: {
-            id,
-            enabled: !!bEnabled
-        }
-    };
+    return { type: TOGGLE, payload: id };
 }
 
 export default function reducer(state = INITIAL_STATE, action)
 {
     switch (action.type) {
-    case "TOGGLE_DATA_SOURCE":
+    case TOGGLE:
         return {
             ...state,
             [action.payload]: {
                 ...state[action.payload],
                 enabled: !state[action.payload].enabled
-            }
-        };
-    case "SET_DATA_SOURCE_ENABLED":
-        return {
-            ...state,
-            [action.payload.id]: {
-                ...state[action.payload.id],
-                enabled: action.payload.enabled
             }
         };
     default:

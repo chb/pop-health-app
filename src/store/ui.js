@@ -23,15 +23,17 @@ const INITIAL_STATE = {
     }
 };
 
+const SET_EDITOR_HEIGHT = "actions:ui:sql-editor:setHeight";
+
 export function setEditorHeight(height)
 {
-    return { type: "SET_EDITOR_HEIGHT", payload: height };
+    return { type: SET_EDITOR_HEIGHT, payload: height };
 }
 
 export default function reducer(state = INITIAL_STATE, action)
 {
     switch (action.type) {
-    case "SET_EDITOR_HEIGHT":
+    case SET_EDITOR_HEIGHT:
         return {
             ...state,
             sqlEditor: {
@@ -39,14 +41,6 @@ export default function reducer(state = INITIAL_STATE, action)
                 height: action.payload
             }
         };
-    // case "SET_DATA_SOURCE_ENABLED":
-    //     return {
-    //         ...state,
-    //         [action.payload.id]: {
-    //             ...state[action.payload.id],
-    //             enabled: action.payload.enabled
-    //         }
-    //     };
     default:
         return state;
     }

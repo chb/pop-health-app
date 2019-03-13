@@ -1,3 +1,5 @@
+const $ = window.jQuery;
+
 const INITIAL_STATE = {
     users: [
         {
@@ -14,19 +16,17 @@ const INITIAL_STATE = {
     currentUser: JSON.parse(sessionStorage.currentUser || "null")
 };
 
-export function setLoading(loading)
+const MERGE       = "actions:auth:merge";
+const SET_LOADING = "actions:auth:setLoading";
+
+export function setLoading(payload)
 {
-    return { type: "SET_LOADING", payload: loading }
+    return { type: SET_LOADING, payload };
 }
 
-export function setError(error)
+export function merge(payload)
 {
-    return { type: "SET_ERROR", payload: error }
-}
-
-export function setCurrentUser(user)
-{
-    return { type: "SET_CURRENT_USER", payload: user }
+    return { type: MERGE, payload };
 }
 
 export function login(email, password)
@@ -40,15 +40,19 @@ export function login(email, password)
                     u => u.email === email && u.password === password
                 );
                 if (!user) {
-                    dispatch(setError(new Error("Invalid email or password")));
-                    dispatch(setLoading(false));
+                    dispatch(merge({
+                        error: new Error("Invalid email or password"),
+                        loading: false
+                    }));
                     reject();
                 }
                 else {
                     sessionStorage.currentUser = JSON.stringify(user);
-                    dispatch(setCurrentUser(user));
-                    dispatch(setError(null));
-                    dispatch(setLoading(false));
+                    dispatch(merge({
+                        currentUser: user,
+                        error: null,
+                        loading: false
+                    }));
                     resolve();
                 }
             }, 1000);
@@ -64,9 +68,11 @@ export function logout()
         return new Promise(resolve => {
             setTimeout(() => {
                 sessionStorage.removeItem("currentUser");
-                dispatch(setCurrentUser(null));
-                dispatch(setError(null));
-                dispatch(setLoading(false));
+                dispatch(merge({
+                    currentUser: null,
+                    error: null,
+                    loading: false
+                }));
                 resolve();
             }, 1000);
         });
@@ -76,12 +82,10 @@ export function logout()
 export default function reducer(state = INITIAL_STATE, action)
 {
     switch (action.type) {
-    case "SET_LOADING":
+    case MERGE:
+        return $.extend(true, {}, state, action.payload);
+    case SET_LOADING:
         return { ...state, loading: !!action.payload };
-    case "SET_ERROR":
-        return { ...state, error: action.payload };
-    case "SET_CURRENT_USER":
-        return { ...state, currentUser: action.payload };
     default:
         return state;
     }
