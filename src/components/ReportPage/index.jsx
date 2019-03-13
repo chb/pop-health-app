@@ -44,6 +44,7 @@ class ReportPage extends React.Component
 
     render()
     {
+        console.log("ReportPage.render")
         return (
             <div>
                 <div className="row">
