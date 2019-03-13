@@ -37,14 +37,8 @@ class ReportPage extends React.Component
         )
     }
 
-    shouldComponentUpdate(newProps) {
-      // return false;
-      return newProps.ui.sqlEditor.height !== this.props.ui.sqlEditor.height;
-    }
-
     render()
     {
-        console.log("ReportPage.render")
         return (
             <div>
                 <div className="row">

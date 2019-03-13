@@ -35,7 +35,6 @@ function CPR(props) {
 class App extends React.Component
 {
     render() {
-        console.log("App.render")
         return (
             <BrowserRouter>
             <div className="App">

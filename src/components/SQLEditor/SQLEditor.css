@@ -1,4 +1,4 @@
-#sql-editor {
+.sql-editor {
     /* height: 200px; */
     min-height: 100px;
     border: 1px solid #CCC;
@@ -6,7 +6,7 @@
     /* overflow: hidden; */
 }
 
-#divider {
+.sql-editor-resizer {
     height: 10px;
     cursor: row-resize;
     user-select: none;
