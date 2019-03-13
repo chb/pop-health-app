@@ -1,0 +1,38 @@
+@import "../../styles/variables.scss";
+
+.app-header {
+    background: $colorBrand;
+    line-height: 45.5px;
+
+    .nav-link {
+        color: #FFF;
+        text-transform: uppercase;
+        padding: 5px 10px;
+        // border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 5px;
+        min-width: 10em;
+        text-align: center;
+        margin: 0 5px;
+        font-weight: bold;
+        cursor: pointer;
+
+        &:hover {
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3) inset;
+            // color: $colorBrand;
+        }
+
+        &.active, &:active, &:focus {
+            background: #FFF;
+            color: $colorBrand;
+        }
+    }
+}
+.app-logo {
+    width: 229px;
+    vertical-align: top;
+    padding: 15px 0;
+
+    a {
+        padding: 0;
+    }
+}

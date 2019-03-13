@@ -1,0 +1,58 @@
+@import "../../styles/variables.scss";
+
+body {
+  background: $colorGray0;
+}
+
+.btn-brand {
+  border: 2px solid $colorBrand;
+  background: #FFF;
+  color: $colorGray6;
+  font-weight: bold;
+  line-height: 1.7;
+  padding-left: 1.6em;
+  padding-right: 1.6em;
+
+  &:hover,
+  &:active,
+  &.active {
+    background: $colorBrand;
+    color: #FFF;
+  }
+}
+
+
+
+
+.table-wrap {
+  background: $colorGray2;
+  border-radius: 5px 5px 0 0;
+
+  > .row {
+    padding: 10px;
+  }
+
+  h5 {
+    line-height: 43px;
+    margin: 0 0 0 10px;
+  }
+
+  thead {
+    background: #EEE;
+    th {
+      border-color: $colorGray3 $colorGray3 $colorGray5 $colorGray3;
+      border-bottom-width: 1px;
+      line-height: normal;
+      color: $colorGray6;
+    }
+  }
+
+  tbody {
+    background: #FFF;
+  }
+
+  td {
+    line-height: normal;
+    color: $colorGray6;
+  }
+}
