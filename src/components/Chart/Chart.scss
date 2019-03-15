@@ -1,0 +1,30 @@
+@import "../../styles/variables.scss";
+
+svg.chart {
+    // width: 200px;
+    
+    .chart-big-text {
+        font-size  : 45px;
+        font-weight: 500;
+        fill       : #000;
+        text-anchor: middle;
+    }
+
+    .chart-small-text {
+        font-size  : 22px;
+        fill       : $colorGray6;
+        text-anchor: middle;
+    }
+
+    .chart-arc-main {
+        fill: none;
+        stroke: $colorBrand;
+        stroke-width: 20px;
+    }
+
+    .chart-arc-bg {
+        fill: none;
+        stroke: $colorGray4;
+        stroke-width: 20px;
+    }
+}

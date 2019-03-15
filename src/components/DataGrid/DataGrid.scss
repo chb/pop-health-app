@@ -1,0 +1,22 @@
+@import "../../styles/variables.scss";
+
+.data-grid {
+    thead {
+      background: #EEE;
+      th {
+        border-color: $colorGray3 $colorGray3 $colorGray5 $colorGray3;
+        border-bottom-width: 1px;
+        line-height: normal;
+        color: $colorGray6;
+      }
+    }
+  
+    tbody {
+      background: #FFF;
+    }
+  
+    td {
+      line-height: normal;
+      color: $colorGray6;
+    }
+}

@@ -1,0 +1,52 @@
+@import "../../styles/variables.scss";
+
+.table-responsive {
+  margin-bottom: 2em;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+}
+.timeline-grid {
+  margin-bottom: 0;
+  table-layout: fixed;
+    thead {
+      background: #EEE;
+      th {
+        // border-color: $colorGray3 $colorGray3 $colorGray5 $colorGray3;
+        // border-bottom-width: 1px;
+        line-height: normal;
+        color: $colorGray6;
+        text-align: center;
+        font-weight: 400;
+        font-size: small;
+        width: 40px;
+
+        &:first-child {
+          width: 140px;
+          border-right: 1px solid #DDD;
+        }
+      }
+    }
+  
+    tbody {
+      background: #FFF;
+
+      th {
+        font-size: small;
+        font-weight: 400;
+        line-height: normal;
+        width: 140px;
+        padding: 0.5rem 0.3rem;
+        border-right: 1px solid #DDD;
+      }
+    }
+  
+    td {
+      line-height: normal;
+      text-align: center;
+      vertical-align: middle;
+      color: $colorGray6;
+
+      &.text-muted {
+        color: rgba(0, 0, 0, 0.2) !important;
+      }
+    }
+}

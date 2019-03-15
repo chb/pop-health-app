@@ -21,9 +21,6 @@ body {
   }
 }
 
-
-
-
 .table-wrap {
   background: $colorGray2;
   border-radius: 5px 5px 0 0;
@@ -35,24 +32,5 @@ body {
   h5 {
     line-height: 43px;
     margin: 0 0 0 10px;
-  }
-
-  thead {
-    background: #EEE;
-    th {
-      border-color: $colorGray3 $colorGray3 $colorGray5 $colorGray3;
-      border-bottom-width: 1px;
-      line-height: normal;
-      color: $colorGray6;
-    }
-  }
-
-  tbody {
-    background: #FFF;
-  }
-
-  td {
-    line-height: normal;
-    color: $colorGray6;
   }
 }

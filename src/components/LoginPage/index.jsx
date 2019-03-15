@@ -40,7 +40,7 @@ class LoginPage extends React.Component
 
     render()
     {
-        const { from } = this.props.location.state || { from: { pathname: "/report" } };
+        const { from } = this.props.location.state || { from: { pathname: "/measures" } };
 
         if (this.props.currentUser) {
             return <Redirect to={from} push />

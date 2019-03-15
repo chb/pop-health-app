@@ -31,7 +31,16 @@ export function toggleDataSource(id)
 export default function reducer(state = INITIAL_STATE, action)
 {
     switch (action.type) {
-    case TOGGLE:
+    case TOGGLE: {
+        let selectedCount = 0;
+        for (const id in state) {
+            if (state[id].enabled) {
+                selectedCount += 1;
+            }
+        }
+        if (selectedCount <= 1 && state[action.payload].enabled) {
+            return state;
+        }
         return {
             ...state,
             [action.payload]: {
@@ -39,6 +48,7 @@ export default function reducer(state = INITIAL_STATE, action)
                 enabled: !state[action.payload].enabled
             }
         };
+    }
     default:
         return state;
     }

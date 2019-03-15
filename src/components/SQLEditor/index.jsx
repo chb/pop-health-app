@@ -2,7 +2,7 @@ import React     from "react";
 import PropTypes from "prop-types";
 import            "./SQLEditor.css";
 
-window.require.config({ paths: { 'vs': 'monaco-editor/min/vs' }});
+window.require.config({ paths: { 'vs': '/monaco-editor/min/vs' }});
 
 export default class SQLEditor extends React.Component
 {
