@@ -1,3 +1,5 @@
+import http from "../http"
+
 const $ = window.jQuery;
 
 const INITIAL_STATE = {
@@ -34,29 +36,17 @@ export function login(email, password)
     return function (dispatch, getState)
     {
         dispatch(setLoading(true));
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                const user = getState().auth.users.find(
-                    u => u.email === email && u.password === password
-                );
-                if (!user) {
-                    dispatch(merge({
-                        error: new Error("Invalid email or password"),
-                        loading: false
-                    }));
-                    reject();
-                }
-                else {
-                    sessionStorage.currentUser = JSON.stringify(user);
-                    dispatch(merge({
-                        currentUser: user,
-                        error: null,
-                        loading: false
-                    }));
-                    resolve();
-                }
-            }, 1000);
-        }).catch(() => 0);
+        return http.login(email, password).then(user => {
+            sessionStorage.currentUser = JSON.stringify(user);
+            dispatch(merge({
+                currentUser: user,
+                error: null,
+                loading: false
+            }));
+        }).catch(error => {
+            console.error(error);
+            dispatch(merge({ error, loading: false }));
+        });
     };
 }
 
@@ -65,16 +55,13 @@ export function logout()
     return function (dispatch, getState)
     {
         dispatch(setLoading(true));
-        return new Promise(resolve => {
-            setTimeout(() => {
-                sessionStorage.removeItem("currentUser");
-                dispatch(merge({
-                    currentUser: null,
-                    error: null,
-                    loading: false
-                }));
-                resolve();
-            }, 1000);
+        return http.logout().then(() => {
+            sessionStorage.removeItem("currentUser");
+            dispatch(merge({
+                currentUser: null,
+                error: null,
+                loading: false
+            }));
         });
     };
 }
