@@ -7,7 +7,7 @@ export default class Checkbox extends React.Component
 {
     static propTypes = {
         label   : PropTypes.string.isRequired,
-        checked : PropTypes.bool.isRequired,
+        checked : PropTypes.oneOfType([PropTypes.bool, PropTypes.number]).isRequired,
         onChange: PropTypes.func.isRequired
     };
 

@@ -1,30 +1,17 @@
-const INITIAL_STATE = {
-    "aetna": {
-        label: "Aetna",
-        enabled: false
-    },
-    "bcbs_ma": {
-        label: "BCBS MA",
-        enabled: false
-    },
-    "hphc": {
-        label: "HPHC",
-        enabled: false
-    },
-    "mass_health": {
-        label: "MassHealth",
-        enabled: true
-    }
-};
-
-const TOGGLE = "actions:payers:togglePayer";
+const TOGGLE = "actions:payers:toggle";
+const LOAD   = "actions:payers:loadData";
 
 export function toggle(id)
 {
     return { type: TOGGLE, payload: id };
 }
 
-export default function reducer(state = INITIAL_STATE, action)
+export function load(data)
+{
+    return { type: LOAD, payload: data };
+}
+
+export default function reducer(state = {}, action)
 {
     switch (action.type) {
     case TOGGLE: {
@@ -36,6 +23,13 @@ export default function reducer(state = INITIAL_STATE, action)
             }
         }
         return nextState;
+    }
+    case LOAD: {
+        const newState = {};
+        action.payload.forEach(rec => {
+            newState[rec.id] = rec;
+        });
+        return newState;
     }
     default:
         return state;

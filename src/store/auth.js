@@ -3,16 +3,6 @@ import http from "../http"
 const $ = window.jQuery;
 
 const INITIAL_STATE = {
-    users: [
-        {
-            email: "user@aco.org",
-            password: "password"
-        },
-        {
-            email: "user@payer.org",
-            password: "password"
-        }
-    ],
     loading: false,
     error: null,
     currentUser: JSON.parse(sessionStorage.currentUser || "null")

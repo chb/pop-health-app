@@ -35,5 +35,6 @@ export function logout() {
 
 export default {
     login,
-    logout
+    logout,
+    request: http
 };

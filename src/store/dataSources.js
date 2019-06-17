@@ -1,34 +1,17 @@
-const INITIAL_STATE = {
-    bch_epic: {
-        label  : "BCH Epic",
-        enabled: true
-    },
-    bch_cerner: {
-        label  : "BCH Cerner",
-        enabled: true
-    },
-    aetna_claims: {
-        label  : "Aetna Claims",
-        enabled: false
-    },
-    mass_health_claims: {
-        label  : "MassHealth Claims",
-        enabled: true
-    },
-    bcbs_claims: {
-        label  : "BCBS Claims",
-        enabled: false
-    }
-};
-
-const TOGGLE = "actions:data-source:toggle";
+const TOGGLE = "actions:dataSources:toggle";
+const LOAD   = "actions:dataSources:loadData";
 
 export function toggleDataSource(id)
 {
     return { type: TOGGLE, payload: id };
 }
 
-export default function reducer(state = INITIAL_STATE, action)
+export function load(data)
+{
+    return { type: LOAD, payload: data };
+}
+
+export default function reducer(state = {}, action)
 {
     switch (action.type) {
     case TOGGLE: {
@@ -48,6 +31,13 @@ export default function reducer(state = INITIAL_STATE, action)
                 enabled: !state[action.payload].enabled
             }
         };
+    }
+    case LOAD: {
+        const newState = {};
+        action.payload.forEach(rec => {
+            newState[rec.id] = rec;
+        });
+        return newState;
     }
     default:
         return state;
