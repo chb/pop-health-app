@@ -31,7 +31,7 @@
 
       th {
         font-size: small;
-        font-weight: 400;
+        font-weight: 500;
         line-height: normal;
         width: 140px;
         padding: 0.5rem 0.3rem;
@@ -41,9 +41,15 @@
   
     td {
       line-height: normal;
-      text-align: center;
+      text-align: right;
       vertical-align: middle;
       color: $colorGray6;
+      position: relative;
+      cursor: pointer;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
 
       &.text-muted {
         color: rgba(0, 0, 0, 0.2) !important;
