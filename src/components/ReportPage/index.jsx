@@ -5,7 +5,6 @@ import Sidebar             from "../Sidebar";
 import SQLEditor           from "../SQLEditor"
 import DataGrid            from "../DataGrid";
 import ReportSummary       from "../ReportSummary";
-import DATA                from "./data";
 import QUERY               from "./query";
 import http                from "../../http"
 import { setEditorHeight } from "../../store/ui"
@@ -155,17 +154,8 @@ class ReportPage extends React.Component
                         <Route path="/report/editor" render={() => this.renderEditor()} />
                         <br/>
                         <br/>
-                        <div className="table-wrap">
-                            <div className="row">
-                                <div className="col-6 align-middle">
-                                    <h5>Results</h5>
-                                </div>
-                                <div className="col-6 text-right">
-                                    <button className="btn btn-brand">EXPORT CSV</button>
-                                </div>
-                            </div>
-                            <DataGrid rows={ DATA }/>
-                        </div>
+                        <DataGrid/>
+                        <br/>
                     </div>
                 </div>
             </div>

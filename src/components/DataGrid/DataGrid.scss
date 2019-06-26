@@ -1,6 +1,62 @@
 @import "../../styles/variables.scss";
 
+.data-grid-header {
+  .data-grid {
+    table-layout: fixed;
+    margin: 0;
+    border: 0;
+    // border: 1px solid $colorGray3;
+    // border-color: $colorGray4 $colorGray3 $colorGray3;
+    th {
+      border-bottom: 0;
+      // border-top: 0;
+      // padding: 0;
+      overflow: hidden;
+      border-top-color: $colorGray4;
+    }
+    th:first-child {
+      border-left-color: $colorGray4;
+    }
+    th:last-child {
+      border-right-color: $colorGray4;
+    }
+  }
+}
+.data-grid-body {
+  overflow: auto;
+  max-height: 300px;
+  // position: relative;
+  border: 1px solid;
+  border-color: $colorGray4;
+
+  .data-grid {
+    margin: 0;
+    min-width: 100%;
+    border: 0px none;
+    // table-layout: fixed;
+
+    tr:first-child > td {
+      border-top: 0;
+    }
+    tr:last-child > td {
+      border-bottom: 0;
+    }
+    td:first-child {
+      border-left: 0;
+    }
+    td:last-child {
+      border-right: 0;
+    }
+    td {
+      white-space: normal;
+      min-width: 5em;
+      border-color: $colorGray2;
+    }
+  }
+}
+
 .data-grid {
+    // table-layout: fixed;
     thead {
       background: #EEE;
       th {
@@ -8,15 +64,33 @@
         border-bottom-width: 1px;
         line-height: normal;
         color: $colorGray6;
+        vertical-align: top;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        // min-width: 2em;
+        // max-width: 4em;
       }
     }
   
     tbody {
       background: #FFF;
     }
+
+    tr {
+      &:focus, &:active {
+        outline: none;
+        td {
+          background: $colorBrand;
+          border-color: $colorBrand;
+          color: #FFF;
+        }
+      }
+    }
   
     td {
       line-height: normal;
       color: $colorGray6;
+      white-space: nowrap;
     }
 }
