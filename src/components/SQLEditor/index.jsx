@@ -1,6 +1,5 @@
 import React     from "react";
 import PropTypes from "prop-types";
-import { query } from "../../http"
 import            "./SQLEditor.css";
 
 window.require.config({ paths: { 'vs': '/monaco-editor/min/vs' }});
