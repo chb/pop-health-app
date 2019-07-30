@@ -1,5 +1,6 @@
 import React     from "react";
 import PropTypes from "prop-types";
+import { query } from "../../http"
 import            "./SQLEditor.css";
 
 window.require.config({ paths: { 'vs': '/monaco-editor/min/vs' }});
@@ -10,7 +11,8 @@ export default class SQLEditor extends React.Component
         query         : PropTypes.string,
         height        : PropTypes.number,
         options       : PropTypes.object,
-        onHeightChange: PropTypes.func.isRequired
+        onHeightChange: PropTypes.func.isRequired,
+        onQuery       : PropTypes.func.isRequired
     };
 
     static defaultProps = {
@@ -32,12 +34,6 @@ export default class SQLEditor extends React.Component
                 ...this.props.options,
                 value: this.props.query
             });
-
-            // this.editor.onDidChangeModelContent(() => {
-            //     this.setState({
-            //         sql: editor.getValue()
-            //     })
-            // })
 
             // Row Resizer -----------------------------------------------------
             const $ = window.jQuery;
@@ -64,6 +60,7 @@ export default class SQLEditor extends React.Component
             <div>
                 <div className="sql-editor" ref={ node => this.editorNode = node } style={{ height: this.props.height }} />
                 <div className="sql-editor-resizer" ref={ node => this.divider = node }>.....</div>
+                <button className="btn btn-brand active" onClick={() => this.props.onQuery(this.editor.getValue())}>RUN</button>
             </div>
         );
     }

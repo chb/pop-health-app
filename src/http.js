@@ -33,8 +33,18 @@ export function logout() {
     return http("auth/logout");
 }
 
+export function query(sql) {
+    const data = new URLSearchParams();
+    data.append("query", sql);
+    return http("sql", {
+        method: "POST",
+        body: data
+    });
+}
+
 export default {
     login,
     logout,
+    query,
     request: http
 };

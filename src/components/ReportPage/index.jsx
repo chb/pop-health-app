@@ -9,6 +9,38 @@ import QUERY               from "./query";
 import http                from "../../http"
 import { setEditorHeight } from "../../store/ui"
 
+function formatDuration(ms) {
+    let out = [];
+    let meta = [
+        { label: "week"  , n: 1000 * 60 * 60 * 24 * 7 },
+        { label: "day"   , n: 1000 * 60 * 60 * 24     },
+        { label: "hour"  , n: 1000 * 60 * 60          },
+        { label: "minute", n: 1000 * 60               },
+        { label: "second", n: 1000                    },
+        { label: "ms"    , n: 1                       }
+    ];
+
+    meta.reduce((prev, cur, i, all) => {
+        let chunk = Math.floor(prev / cur.n);
+        if (chunk) {
+            out.push(`${chunk} ${cur.label}${chunk > 1 && cur.n > 1 ? "s" : ""}`);
+            return prev - chunk * cur.n
+        }
+        return prev
+    }, ms);
+
+    if (!out.length) {
+        out.push(`0 ${meta.pop().label}`);
+    }
+
+    if (out.length > 1) {
+        let last = out.pop();
+        out[out.length - 1] += " and " + last;
+    }
+
+    return out.join(", ")
+}
+
 class ReportPage extends React.Component
 {
     constructor(props)
@@ -16,16 +48,28 @@ class ReportPage extends React.Component
         super(props);
 
         this.state = {
-            loading: true,
-            error  : null,
-            data   : null,
 
             // These are populated from URL params
+            // -----------------------------------------------------------------
             clinic : "", // Clinic ID
             date   : "", // YYYY-MM
             measure: "", // Measure ID
             org    : "", // Org ID
-            payer  : ""  // Payer ID
+            payer  : "", // Payer ID
+
+            // Data and state of the currently selected report
+            // -----------------------------------------------------------------
+            loading: true,
+            error  : null,
+            data   : null,
+
+            // Data, query and state of the SQL editor
+            // -----------------------------------------------------------------
+            prestoLoading: null,
+            prestoError  : null,
+            prestoData   : null,
+            queryTime    : 0,
+            query        : ""
         };
 
         const query = new URLSearchParams(this.props.location.search);
@@ -66,8 +110,37 @@ class ReportPage extends React.Component
           this.state.payer = query.get("payer");
 
         } while (false);
+
+        this.timer = null;
     }
 
+    /**
+     * Starts a timer that is active while a query is running. When the query is
+     * complete (successful or not) the timer will destroy itself. This is used
+     * to measure the total time that it takes to execute a query and receive
+     * the result.
+     */
+    startClock() {
+        const start = Date.now();
+
+        const tick = () => {
+            if (this.state.prestoLoading) {
+                this.setState({
+                    queryTime: Date.now() - start
+                }, () => {
+                    this.timer = setTimeout(tick, 100);
+                });
+            } else {
+                this.timer = null;
+            }
+        };
+
+        tick();
+    }
+
+    /**
+     * Loads the report data
+     */
     loadData()
     {
         const uri = `/api/measures/results/${this.state.measure}?payer=${
@@ -78,21 +151,42 @@ class ReportPage extends React.Component
             data  => this.setState({ data, loading: false }),
             error => this.setState({ error, loading: false })
         );
-        // const {
-        //     date,
-        //     measure: {
-        //         id: measureId
-        //     }
-        // } = this.props.location.state;
-        // "/api/measures/results/immunization_for_adolescents?payer=bcbs_ma&org=bch"
-        // measureId
-        // payer
-        // org
-        // clinic
-        // ds
-        // date
     }
 
+    /**
+     * Execute an SQL query and render the results in the grid
+     * @param {String} q The SQL to execute
+     */
+    runQuery(q)
+    {
+        this.setState({
+            prestoLoading: true,
+            queryTime: 0,
+            query: q
+        }, () => {
+            this.startClock();
+            http.query(q).then(
+                resp => {
+                    this.setState({
+                        prestoLoading: false,
+                        prestoError  : null,
+                        prestoData   : resp
+                    });
+                },
+                err => {
+                    this.setState({
+                        prestoLoading: false,
+                        prestoError  : err,
+                        prestoData   : null
+                    });
+                }
+            );
+        });
+    }
+
+    /**
+     * Fetch the report data after the first render
+     */
     componentDidMount()
     {
         this.loadData();
@@ -101,21 +195,19 @@ class ReportPage extends React.Component
     renderEditor()
     {
         return (
-            <div>
-                <SQLEditor
-                    query={ QUERY }
-                    { ...this.props.ui.sqlEditor }
-                    onHeightChange={ h => this.props.dispatch(setEditorHeight(h)) }
-                />
-                <button className="btn btn-brand active">RUN</button>
-            </div>
+            <SQLEditor
+                query={ QUERY }
+                { ...this.props.ui.sqlEditor }
+                onHeightChange={ h => this.props.dispatch(setEditorHeight(h)) }
+                onQuery={ q => this.runQuery(q) }
+            />
         );
     }
 
     render()
     {
       
-        const { error, loading } = this.state;
+        const { error, loading, prestoError, prestoData, prestoLoading, queryTime, query } = this.state;
         if ( error ) {
             console.error(error);
             return <b>{ error.message }</b>
@@ -152,9 +244,27 @@ class ReportPage extends React.Component
                         <br/>
                         <Route path="/report" exact component={ReportSummary}/>
                         <Route path="/report/editor" render={() => this.renderEditor()} />
+                        {
+                            queryTime ?
+                            <div className="float-right" style={{ marginTop: "-4em", fontSize: 11, color: "#999", textAlign: "right" }}>
+                                    Total time: { formatDuration(queryTime) }<br/>
+                                {/* { !prestoLoading && prestoData && prestoData.processedRows ? "Processed rows: " + String(prestoData.processedRows).replace(/\d(?=(\d{3})+$)/g, '$&,') : "" }<br/> */}
+                                { !prestoLoading && prestoData ? "Result rows: " + prestoData.data.length : "" }
+                            </div> :
+                            null
+                        }
                         <br/>
                         <br/>
-                        <DataGrid/>
+                        {
+                            prestoLoading ?
+                                <div className="alert alert-info">Loading...</div> :
+                                prestoError ?
+                                    <div className="alert alert-danger">{ prestoError.message }</div> :
+                                    prestoData ?
+                                        <DataGrid data={ prestoData } query={query}/> :
+                                        <div className="alert alert-info">No data to display</div>
+                        }
+                        
                         <br/>
                     </div>
                 </div>

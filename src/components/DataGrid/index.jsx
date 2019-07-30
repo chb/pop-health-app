@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React     from "react";
 import PropTypes from "prop-types";
 import                "./DataGrid.scss";
@@ -5,58 +6,42 @@ import                "./DataGrid.scss";
 export default class RemoteDataGrid extends React.Component
 {
     static propTypes = {
-        url: PropTypes.string
+
+        /**
+         * Let the grid know what SQL query has produced the data. This is
+         * needed so that we can build the download csv link
+         */
+        query: PropTypes.string.isRequired,
+
+        /**
+         * The data to render in the grid
+         */
+        data: PropTypes.shape({
+            header: PropTypes.arrayOf(PropTypes.string),
+            data: PropTypes.arrayOf(PropTypes.array)
+        })
     };
 
-    static defaultProps = {
-        url: "http://localhost:3003/api/measures/report?limit=1000"
-    }
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            loading: true,
-            error: null,
-            data: null
-        };
-    }
-
-    componentDidMount()
+    buildCsvUrl()
     {
-        fetch(this.props.url)
-            .then(res => res.json())
-            .then(data => this.setState({
-                loading: false,
-                data
-            }))
-            .catch(error => this.setState({
-                loading: false,
-                error
-            }))
+        return "http://localhost:3003/sql/csv?q=" + btoa(this.props.query);
     }
 
     render() {
-        const { loading, error, data } = this.state;
-
-        if (loading) {
-            return "Loading...";
-        }
-
-        if (error) {
-            return error.message;
-        }
-
-        const downloadUrl = new URL(this.props.url);
-        downloadUrl.searchParams.set("type", "csv");
+        const { data = {} } = this.props;
 
         return (
             <div className="table-wrap">
                 <div className="row">
                     <div className="col-6 align-middle">
-                        <h5>Results</h5>
+                        <h5>Preview</h5>
                     </div>
                     <div className="col-6 text-right">
-                        <a className="btn btn-brand" href={downloadUrl}>EXPORT CSV</a>
+                        <a
+                            className="btn btn-brand"
+                            href={ this.buildCsvUrl() }
+                            download="report.csv"
+                        >DOWNLOAD CSV</a>
                     </div>
                 </div>
                 <DataGrid cols={ data.header } rows={ data.data} />
@@ -98,8 +83,8 @@ class DataGrid extends React.Component
             let headerCells = this.wrapper.current.querySelectorAll(".data-grid-header th");
             let bodyCells = this.wrapper.current.querySelectorAll(".data-grid-body tr:first-child td");
             bodyCells.forEach((td, i) => {
-                headerCells[i].style.width = td.offsetWidth + "px";
-            })
+                headerCells[i].style.width = Math.floor(td.clientWidth + 1) + "px";
+            });
         }
     }
 
@@ -111,20 +96,6 @@ class DataGrid extends React.Component
             return <p className="text-center">No data</p>;
         }
     
-        // const sum = cols.reduce((total, c) => total + c.length, 0);
-
-        // const colGroup = (
-        //     <colgroup>
-        //     {
-        //         cols.map((key, i) => (
-        //             <col key={"col-" + i} style={ i ? {
-        //                 width: (key.length / sum * 100) + "%"
-        //             } : null }/>
-        //         ))
-        //     }
-        //     </colgroup>
-        // );
-
         const header = (
             <thead>
                 <tr>
@@ -136,7 +107,7 @@ class DataGrid extends React.Component
         );
 
         const body = rows.map((rec, i) => (
-            <tr key={i} tabindex={0}>
+            <tr key={i} tabIndex={0}>
                 { rec.map((key, y) => (
                     <td key={"cell-" + i + "-" + y}>{ key }</td>
                 )) }
@@ -147,13 +118,11 @@ class DataGrid extends React.Component
             <div ref={ this.wrapper }>
                 <div className="data-grid-header">
                     <table className="table table-sm table-bordered table-hover data-grid">
-                        {/* { colGroup } */}
                         { header }
                     </table>
                 </div>
                 <div className="data-grid-body">
                     <table className="table table-sm table-bordered table-hover data-grid">
-                        {/* { colGroup } */}
                         <tbody>{ body }</tbody>
                     </table>
                 </div>

@@ -2,7 +2,7 @@
 
 .data-grid-header {
   .data-grid {
-    table-layout: fixed;
+    // table-layout: fixed;
     margin: 0;
     border: 0;
     // border: 1px solid $colorGray3;
@@ -51,6 +51,8 @@
       white-space: normal;
       min-width: 5em;
       border-color: $colorGray2;
+      overflow: auto;
+      max-width: 100%;
     }
   }
 }
