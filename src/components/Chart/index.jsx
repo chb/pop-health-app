@@ -11,46 +11,56 @@ function getCoordinatesForPercent(percent) {
 export default class Chart extends React.Component
 {
     static propTypes = {
-        /**
-         * Floating point number between 0 and 100
-         */
-        value: PropTypes.number.isRequired,
-        subText: PropTypes.string.isRequired
+        numerator  : PropTypes.number.isRequired,
+        denominator: PropTypes.number.isRequired,
+        duration   : PropTypes.number,
+        easing     : PropTypes.string
     };
 
-    render()
-    {
-        const percent = Math.max(Math.min(this.props.value, 100), 0);
+    static defaultProps = {
+        duration: 1600,
+        easing  : "easeInOutExpo"
+    };
+
+    constructor(props) {
+        super(props);
+        this.state = { numerator: 0 };
+    }
+
+    componentDidMount() {
+        window.jQuery({ numerator: 0 }).animate(
+            {
+                numerator: this.props.numerator
+            },
+            {
+                duration: this.props.duration,
+                easing  : this.props.easing,
+                step: numerator => this.setState({ numerator })
+            }
+        );
+    }
+
+    render() {
+        const percent = Math.max(Math.min(this.state.numerator / this.props.denominator * 100, 100), 0);
         const largeArcFlag = percent >= 50 ? 1 : 0;
         const [x, y] = getCoordinatesForPercent(percent/100);
-
         return (
-          <svg className="chart" viewBox="-110 -110 220 220">
-              {/* <circle cx={0} cy={0} r={80} style={{ fill: "#FFF "}}/> */}
-              <text
-                className="chart-big-text"
-                y={ this.props.subText ? 0 : 20 }
-              >{percent}%</text>
-              {
-                this.props.subText && <text className="chart-small-text" y={35}>
-                  {this.props.subText}
-                </text>
-              }
-              {
-                percent === 0 ?
-                <circle cx={0} cy={0} r={100} className="chart-arc-bg"/> :
-                <g style={{ transform: "rotate(-0.25turn)" }}>
-                  <path
-                    className="chart-arc-main"
-                    d={`M 100 0 A 100 100 0 ${largeArcFlag} 1 ${x} ${y}`}
-                  />
-                  <path
-                    className="chart-arc-bg"
-                    d={`M ${x} ${y} A 100 100 0 ${largeArcFlag ? 0 : 1 } 1 100 0`}
-                  />
-                </g>
-              }
-          </svg>
-       );
+            <svg className="chart" viewBox="-110 -110 220 220">
+                <text className="chart-big-text" y={0}>{Math.round(percent)}%</text>
+                {
+                    <text className="chart-small-text" y={35}>
+                        {Math.round(this.state.numerator)}/{this.props.denominator}
+                    </text>
+                }
+                {
+                    percent === 0 ?
+                        <circle cx={0} cy={0} r={100} className="chart-arc-bg"/> :
+                        <g style={{ transform: "rotate(-0.25turn)" }}>
+                            <path className="chart-arc-main" d={`M 100 0 A 100 100 0 ${largeArcFlag} 1 ${x} ${y}`}/>
+                            <path className="chart-arc-bg" d={`M ${x} ${y} A 100 100 0 ${largeArcFlag ? 0 : 1 } 1 100 0`}/>
+                        </g>
+                }
+            </svg>
+        );
     }
 }
