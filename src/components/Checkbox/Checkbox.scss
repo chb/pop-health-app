@@ -24,4 +24,12 @@
         vertical-align: top;
         color: $colorBrand;
     }
+
+    &:disabled, &[disabled] {
+        &, & i {
+            color: #999;
+            text-shadow: 0 1px 0 #FFF;
+            cursor: not-allowed;
+        }
+    }
 }
