@@ -1,37 +1,66 @@
-import React from "react";
-import Chart from "../Chart";
-import            "./ReportSummary.scss";
+import React     from "react";
+import moment    from "moment";
+import PropTypes from "prop-types";
+import Chart     from "../Chart";
+import                "./ReportSummary.scss";
 
 export default class ReportSummary extends React.Component
 {
+    static propTypes = {
+        date                  : PropTypes.string.isRequired,
+        clinic                : PropTypes.string,
+        measureName           : PropTypes.string,
+        numeratorValue        : PropTypes.number,
+        denominatorValue      : PropTypes.number,
+        measureDescription    : PropTypes.string,
+        numeratorDescription  : PropTypes.string,
+        denominatorDescription: PropTypes.string
+    };
+
     render()
     {
+        const {
+            date,
+            clinic,
+            measureName,
+            numeratorValue,
+            denominatorValue,
+            measureDescription,
+            numeratorDescription,
+            denominatorDescription
+        } = this.props;
+
+
         return (
             <div className="report-summary">
                 <div className="row">
                     <div className="col-8">
-                        <div className="sub-title">Boston Clinic: March</div>
-                        <div className="title">Immunizations for Adolescents</div>
+                        <div className="sub-title">{ clinic }: { moment(date).format("MMMM YYYY") }</div>
+                        <div className="title">{ measureName }</div>
                     </div>
                     <div className="col">
-                        <Chart value={33} subText="708/2034"/>
+                        <Chart
+                            numerator={ numeratorValue }
+                            denominator={ denominatorValue }
+                            value={Math.round(numeratorValue / denominatorValue * 100)} subText={`${numeratorValue}/${denominatorValue}`}
+                        />
                     </div>
                 </div>
                 <div className="row">
                     <div className="col">
                         <p className="sub-title">POPULATION HEALTH IMPACT</p>
-                        <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>
+                        <p>{ measureDescription }</p>
                     </div>
                 </div>
                 <br/>
                 <div className="row">
                     <div className="col">
                         <p className="sub-title">NUMERATOR</p>
-                        <p>The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.</p>
+                        <p>{ numeratorDescription }</p>
                     </div>
                     <div className="col">
                         <p className="sub-title">DENOMINATOR</p>
-                        <p>The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.</p>
+                        <p>{ denominatorDescription }</p>
                     </div>
                 </div>
             </div>
