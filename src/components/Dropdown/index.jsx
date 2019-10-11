@@ -36,7 +36,7 @@ export default class Dropdown extends React.Component
             this.setState({ open: false });
         }
         this.props.onSelect(option.value);
-    };
+    }
 
     renderOptions()
     {
@@ -54,7 +54,7 @@ export default class Dropdown extends React.Component
                     <b>{ opt.label }</b>
                     { opt.description && <div className="small text-muted">{ opt.description }</div> }
                 </div>
-            )
+            );
         });
     }
 

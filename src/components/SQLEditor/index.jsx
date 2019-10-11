@@ -2,7 +2,7 @@ import React     from "react";
 import PropTypes from "prop-types";
 import            "./SQLEditor.css";
 
-window.require.config({ paths: { 'vs': '/monaco-editor/min/vs' }});
+window.require.config({ paths: { vs: "/monaco-editor/min/vs" }});
 
 export default class SQLEditor extends React.Component
 {
@@ -18,6 +18,11 @@ export default class SQLEditor extends React.Component
         query: ""
     };
 
+    shouldComponentUpdate()
+    {
+        return false;
+    }
+
     componentWillUnmount()
     {
         if (this.editor) {
@@ -28,29 +33,31 @@ export default class SQLEditor extends React.Component
 
     componentDidMount()
     {
-        window.require(['vs/editor/editor.main'], monaco => {
-            this.editor = monaco.editor.create(this.editorNode, {
-                ...this.props.options,
-                value: this.props.query
-            });
-
-            // Row Resizer -----------------------------------------------------
-            const $ = window.jQuery;
-            const $window = $(window);
-            const $editor = $(this.editorNode);
-
-            $(this.divider).on("mousedown", startEvent => {
-                const startY = startEvent.clientY;
-                let height = $editor.css({ overflow: "hidden" }).height();
-                $window.on("mouseup.resize", () => {
-                    $editor.css({ overflow: "visible" });
-                    this.props.onHeightChange($editor.outerHeight());
-                    $window.off(".resize");
+        window.require(["vs/editor/editor.main"], monaco => {
+            if (this.editorNode) {
+                this.editor = monaco.editor.create(this.editorNode, {
+                    ...this.props.options,
+                    value: this.props.query
                 });
-                $window.on("mousemove.resize", moveEvent => {
-                    $editor.height(height + moveEvent.clientY - startY);
+
+                // Row Resizer -----------------------------------------------------
+                const $ = window.jQuery;
+                const $window = $(window);
+                const $editor = $(this.editorNode);
+
+                $(this.divider).on("mousedown", startEvent => {
+                    const startY = startEvent.clientY;
+                    let height = $editor.css({ overflow: "hidden" }).height();
+                    $window.on("mouseup.resize", () => {
+                        $editor.css({ overflow: "visible" });
+                        this.props.onHeightChange($editor.outerHeight());
+                        $window.off(".resize");
+                    });
+                    $window.on("mousemove.resize", moveEvent => {
+                        $editor.height(height + moveEvent.clientY - startY);
+                    });
                 });
-            });
+            }
         });
     }
 
