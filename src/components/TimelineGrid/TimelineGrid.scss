@@ -30,29 +30,70 @@
       background: #FFF;
 
       th {
-        font-size: small;
-        font-weight: 500;
-        line-height: normal;
-        width: 140px;
-        padding: 0.5rem 0.3rem;
+        font-size   : small;
+        font-weight : 500;
+        line-height : normal;
+        width       : 140px;
+        padding     : 0.5rem 0.3rem;
         border-right: 1px solid #DDD;
+        cursor      : default;
+        height      : 49px;
+        vertical-align: middle;
       }
     }
   
     td {
-      line-height: normal;
-      text-align: right;
+      line-height   : normal;
+      text-align    : center;
       vertical-align: middle;
-      color: $colorGray6;
-      position: relative;
-      cursor: pointer;
+      color         : $colorGray6;
+      position      : relative;
+      cursor        : pointer;
+      font-size     : 0.85rem;
+      position      : relative;
 
-      &:hover {
-        background: rgba(0, 0, 0, 0.1);
+      a {
+        display: inline-block;
+        // height: 100%;
+        // width: 100%;
+        // background: orange;
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        right: 3px;
+        bottom: 3px;
+        text-align    : center;
+        vertical-align: middle;
+        line-height   : 3.3em;
+        color         : $colorGray6;
+        border-radius : 3px;
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.1);
+          box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2) inset;
+          text-decoration: none;
+        }
+        
+        &.text-muted {
+          color: rgba(0, 0, 0, 0.2) !important;
+        }
       }
+    }
 
-      &.text-muted {
-        color: rgba(0, 0, 0, 0.2) !important;
+    tr:hover {
+      background: $colorGray0;
+    }
+    tr.selected, tr.selected:hover {
+      background: $colorBrand;
+      th, td, a {
+        color: #FFF;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+        &.text-muted {
+          color: rgba(255, 255, 255, 0.5) !important;
+        }
+      }
+      a:hover {
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.3) inset;
       }
     }
 }
