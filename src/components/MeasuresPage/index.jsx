@@ -1,8 +1,4 @@
-import React        from "react";
-import { connect }  from "react-redux";
-import Sidebar      from "../Sidebar";
-import Dropdown     from "../Dropdown"
-import TimelineGrid from "../TimelineGrid";
+import LineChart                 from "../LineChart";
 import { toggle as toggleOrg   } from "../../store/organizations";
 import { toggle as togglePayer } from "../../store/payers";
 // import { queryMeasures } from "../../store/measureResults";
@@ -125,25 +121,30 @@ class MeasuresPage extends React.Component
                 error => this.setState({ error, loading: false })
             );
 
-            // // debugger;
-            // this.props.dispatch(queryMeasures({
-            //     org: this.props.organizations.filter(o => !!o.selected).map(o => o.id),
-            //     payer: "mass_health"
-            //     // clinic,
-            //     // ds,
-            //     // startDate,
-            //     // endDate
-            // }));
+    getChartOptions(orgId, orgData, measure) {
+        const series = [ { data: [] }, { data: [] } ];
+        Object.keys(measure.data).forEach(key => {
+            const thisYear = moment().format("YYYY");
+            const [ year, month ] = key.split("-");
+            const rec = measure.data[key];
+            const point = { x: month - 1, y: rec.pct, name: moment(key).format("MMMM") };
+            if (year === thisYear) {
+                series[0].data.push(point);
         }
+            else if (+year === thisYear - 1) {
+                series[1].data.push(point);
     }
+        });
 
-    // getSnapshotBeforeUpdate(prevProps, prevState) {
-    //     if (prevProps)
-    // }
-
-    componentDidUpdate(prevProps, prevState)
-    {
-        if (this.hasChanges(prevProps)) this.query();
+        return {
+            title: {
+                text: measure.name
+            },
+            subtitle: {
+                text: orgData.description
+            },
+            series
+        };
     }
 
     componentDidMount()
@@ -198,7 +199,17 @@ class MeasuresPage extends React.Component
             );
         }
 
-        return reports;
+        return (
+            <>
+                <LineChart key="line-chart" chartOptions={ this.getChartOptions(orgId, org, measure) }/>
+                <div style={{
+                    maxHeight: "calc(100vh - 210px)",
+                    overflow: "auto"
+                }}>
+                    { reports }
+                </div>
+            </>
+        );
     }
 
     render()
