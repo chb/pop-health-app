@@ -2,6 +2,7 @@ import React             from "react";
 import PropTypes         from "prop-types";
 import moment            from "moment";
 import { connect }       from "react-redux";
+import { Link }          from "react-router-dom";
 import                        "./TimelineGrid.scss";
 
 
@@ -41,7 +42,17 @@ export class TimelineGrid extends React.Component
          * it can be different, n which case we render table that has no
          * selected row.
          */
-        orgId: PropTypes.string
+        orgId: PropTypes.string,
+
+        /**
+         * The organization that is being rendered.
+         */
+        org: PropTypes.object,
+
+        /**
+         * The dataSources included in this grid
+         */
+        dataSources: PropTypes.object
     };
 
     static defaultProps = {
@@ -76,16 +87,22 @@ export class TimelineGrid extends React.Component
                 const title = `${dateObject.format("MMM YYYY")} - ${entry.numerator} of ${entry.denominator}`;
                 const pct = Math.round(entry.pct);
 
+                const query = new URLSearchParams();
+                query.set("date", dateObject.format("YYYY-MM-DD"));
+                query.set("measure", measure.id);
+                query.set("org", this.props.org.value);
+                Object.keys(this.props.dataSources).forEach(key => {
+                    if (this.props.dataSources[key].selected) {
+                        query.append("ds", key);
+                    }
+                });
+
                 // Values from the current year "overlap" the values from the
                 // last year. We can compare them and show trends
                 if (dateObject.isSame(now, "year")) {
-                    // const prevDate = moment(dateObject).subtract(1, "year");
-                    // const prevValue = measure.data[prevDate.format("YYYY-MM")];
-                    // const diff = Math.round(measure.data[date] - prevValue);
-
                     cells[i % 12] = (
                         <td key={date} title={title}>
-                            <a href={`/report/${entry.id}`}>{ Math.round(pct) }%</a>
+                            <Link to={`/report?${query}`}>{ Math.round(pct) }%</Link>
                         </td>
                     );
                 }
@@ -97,7 +114,7 @@ export class TimelineGrid extends React.Component
                     if (!measure.data[newDate]) {
                         cells[i % 12] = (
                             <td key={date} title={title}>
-                                <a href={`/report/${entry.id}`} className="text-muted">{ Math.round(pct) }%</a>
+                                <Link to={`/report?${query}`} className="text-muted">{ Math.round(pct) }%</Link>
                             </td>
                         );
                     }
@@ -111,7 +128,7 @@ export class TimelineGrid extends React.Component
                     className={
                         (this.props.selectedOrgId === this.props.orgId &&
                          this.props.selectedMeasureId === measure.id) ? "selected" : "" }
-                    onClick={ e => { if (e.target.nodeName != "A") this.props.onRowClick(measure) }}
+                    onClick={ e => { if (e.target.nodeName != "A") this.props.onRowClick(measure); }}
                 >
                     <th>{ measure.name }</th>
                     { cells }
@@ -144,4 +161,8 @@ export class TimelineGrid extends React.Component
     }
 }
 
-export default connect()(TimelineGrid);
+export default connect(
+    state => ({
+        dataSources: state.dataSources,
+    })
+)(TimelineGrid);
