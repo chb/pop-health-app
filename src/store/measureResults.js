@@ -1,10 +1,11 @@
-import http from "../http"
+import http from "../http";
 
 
 const INITIAL_STATE = {
     loading: false,
-    error: null,
-    data: null
+    error  : null,
+    data   : null,
+    uri    : ""
 };
 
 const SET_LOADING = "actions:measureResults:setLoading";
@@ -12,30 +13,78 @@ const SET_ERROR   = "actions:measureResults:setError";
 const SET_DATA    = "actions:measureResults:setData";
 const MERGE       = "actions:measureResults:merge";
 
+/**
+ * Compile and return the uri that will be used to query the measure results.
+ * If any of the needed variables are missing (E.g. not available yet), it
+ * will return null.
+ */
+export function getQueryUri(state, { org, payer, clinic, ds } = {})
+{
+    let q = new URLSearchParams();
 
-export function queryMeasures({ org, payer, clinic, ds, startDate, endDate })
+    // console.log(state);
+
+    // payers ------------------------------------------------------------------
+    if (payer) {
+        q.append("payer", payer);
+    } else {
+        Object.keys(state.payers).map(id => {
+            if (state.payers[id].selected) q.append("payer", id);
+            return true;
+        });
+    }
+
+    // organizations -----------------------------------------------------------
+    if (org) {
+        q.append("org", org);
+    } else {
+        Object.keys(state.organizations).map(id => {
+            if (state.organizations[id].enabled) q.append("org", id);
+            return true;
+        });
+    }
+
+    // Clinics -----------------------------------------------------------------
+    // TODO
+
+    // Data Sources ------------------------------------------------------------
+    if (ds) {
+        q.append("ds", ds);
+    } else {
+        Object.keys(state.dataSources).map(id => {
+            if (state.dataSources[id].selected) q.append("ds", id);
+            return true;
+        });
+    }
+
+    // payer and data source are required
+    if (!q.has("payer") || !q.has("ds")) {
+        return null;
+    }
+
+    q = q.toString();
+
+    if (!q) {
+        return null;
+    }
+
+    return "/api/measure/result?" + q;
+}
+
+
+export function queryMeasures(options = {})
 {
     return function(dispatch, getState) {
-        dispatch(setLoading(true));
-        const q = new URLSearchParams();
-        q.set("payer"    , payer);
-        if (startDate)
-            q.set("startDate", startDate);
-        if (endDate)
-            q.set("endDate"  , endDate);
-        (org || []).forEach(id => {
-            q.append("org", id);
-        });
-        (clinic || []).forEach(id => {
-            q.append("clinic", id);
-        });
-        (ds || []).forEach(id => {
-            q.append("ds", ds);
-        });
-        http.request("/api/measures/results?" + q).then(
-            data  => dispatch(merge({ loading: false, data })),
-            error => dispatch(merge({ loading: false, error }))
-        );
+
+        const state = getState();
+        const uri   = getQueryUri(state, options);
+        if (uri && uri !== state.uri) {
+            dispatch(merge({ uri, loading: true }));
+            http.request(uri).then(
+                data  => dispatch(merge({  data, loading: false })),
+                error => dispatch(merge({ error, loading: false }))
+            );
+        }
     };
 }
 
