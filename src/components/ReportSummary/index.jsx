@@ -42,7 +42,6 @@ export default class ReportSummary extends React.Component
                         <Chart
                             numerator={ numeratorValue }
                             denominator={ denominatorValue }
-                            value={Math.round(numeratorValue / denominatorValue * 100)} subText={`${numeratorValue}/${denominatorValue}`}
                         />
                     </div>
                 </div>
