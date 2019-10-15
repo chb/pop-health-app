@@ -1,14 +1,26 @@
+import { selectClaimsDataSource } from "./dataSources";
+
 const TOGGLE = "actions:payers:toggle";
 const LOAD   = "actions:payers:loadData";
 
-export function toggle(id)
-{
-    return { type: TOGGLE, payload: id };
+export function toggle(id) {
+    return function(dispatch, getState) {
+
+        const oldState = getState();
+        const payer = oldState.payers[id];
+        const correspondingClaimsDataSourceId = payer.dataSource;
+
+        if (!payer.selected) {
+            dispatch(selectClaimsDataSource(correspondingClaimsDataSourceId));
+        }
+        dispatch({ type: TOGGLE, payload: id });
+    };
 }
 
-export function load(data)
-{
-    return { type: LOAD, payload: data };
+export function load(data) {
+    return function(dispatch) {
+        dispatch({ type: LOAD, payload: data });
+    };
 }
 
 export default function reducer(state = {}, action)
@@ -19,8 +31,8 @@ export default function reducer(state = {}, action)
         for (const id in state) {
             nextState[id] = {
                 ...state[id],
-                enabled: id === action.payload ? !state[action.payload].enabled : false
-            }
+                selected: id === action.payload ? !state[action.payload].selected : false
+            };
         }
         return nextState;
     }
