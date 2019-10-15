@@ -1,13 +1,13 @@
 import React               from "react";
+import PropTypes           from "prop-types";
 import { connect }         from "react-redux";
 import { Route, NavLink }  from "react-router-dom";
 import Sidebar             from "../Sidebar";
-import SQLEditor           from "../SQLEditor"
+import SQLEditor           from "../SQLEditor";
 import DataGrid            from "../DataGrid";
 import ReportSummary       from "../ReportSummary";
-import QUERY               from "./query";
-import http                from "../../http"
-import { setEditorHeight } from "../../store/ui"
+import http                from "../../http";
+import { setEditorHeight } from "../../store/ui";
 
 function formatDuration(ms) {
     let out = [];
@@ -20,13 +20,13 @@ function formatDuration(ms) {
         { label: "ms"    , n: 1                       }
     ];
 
-    meta.reduce((prev, cur, i, all) => {
+    meta.reduce((prev, cur) => {
         let chunk = Math.floor(prev / cur.n);
         if (chunk) {
             out.push(`${chunk} ${cur.label}${chunk > 1 && cur.n > 1 ? "s" : ""}`);
-            return prev - chunk * cur.n
+            return prev - chunk * cur.n;
         }
-        return prev
+        return prev;
     }, ms);
 
     if (!out.length) {
@@ -38,78 +38,37 @@ function formatDuration(ms) {
         out[out.length - 1] += " and " + last;
     }
 
-    return out.join(", ")
+    return out.join(", ");
 }
 
 class ReportPage extends React.Component
 {
+    static propTypes = {
+        match: PropTypes.shape({
+            params: PropTypes.shape({
+                id     : PropTypes.string,
+                date   : PropTypes.string,
+                measure: PropTypes.string,
+                org    : PropTypes.string
+            })
+        }),
+        location: PropTypes.object,
+        ui: PropTypes.shape({
+            sqlEditor: PropTypes.object
+        }),
+        dispatch: PropTypes.func.isRequired,
+        dataSources: PropTypes.object
+    };
+
     constructor(props)
     {
         super(props);
 
         this.state = {
-
-            // These are populated from URL params
-            // -----------------------------------------------------------------
-            clinic : "", // Clinic ID
-            date   : "", // YYYY-MM
-            measure: "", // Measure ID
-            org    : "", // Org ID
-            payer  : "", // Payer ID
-
-            // Data and state of the currently selected report
-            // -----------------------------------------------------------------
             loading: true,
             error  : null,
-            data   : null,
-
-            // Data, query and state of the SQL editor
-            // -----------------------------------------------------------------
-            prestoLoading: null,
-            prestoError  : null,
-            prestoData   : null,
-            queryTime    : 0,
-            query        : ""
+            data   : null
         };
-
-        const query = new URLSearchParams(this.props.location.search);
-
-        do {
-
-          // We expect to be told where the report has been generated. This is the
-          // clinic but until we have the clinics implemented, we are using a
-          // default clinic ("boston_clinic") for every report
-          this.state.clinic = query.get("clinic") || "boston_clinic";
-
-          // We expect to be told which date to look for
-          if (!query.has("date")) {
-              this.state.error = new Error("A 'date' parameter is required");
-              break;
-          }
-          this.state.date = query.get("date");
-
-          // We expect to be told which measure to look for
-          if (!query.has("measure")) {
-              this.state.error = new Error("A 'measure' parameter is required");
-              break;
-          }
-          this.state.measure = query.get("measure");
-
-          // We expect to be told which organization should be used
-          if (!query.has("org")) {
-              this.state.error = new Error("A 'org' parameter is required");
-              break;
-          }
-          this.state.org = query.get("org");
-
-          // We expect to be told which payer should be used
-          if (!query.has("payer")) {
-              this.state.error = new Error("A 'payer' parameter is required");
-              break;
-          }
-          this.state.payer = query.get("payer");
-
-        } while (false);
 
         this.timer = null;
     }
@@ -143,14 +102,24 @@ class ReportPage extends React.Component
      */
     loadData()
     {
-        const uri = `/api/measures/results/${this.state.measure}?payer=${
-          this.state.payer}&org=${this.state.org}&date=${this.state.date
-          }&clinic=${this.state.clinic}`;
-        this.setState({ loading: true });
-        http.request(uri).then(
-            data  => this.setState({ data, loading: false }),
-            error => this.setState({ error, loading: false })
-        );
+        const dsKeys = Object.keys(this.props.dataSources);
+        const query = new URLSearchParams(this.props.location.search);
+
+        if (dsKeys.length) {
+            query.delete("ds");
+            dsKeys.forEach(key => {
+                if (this.props.dataSources[key].selected) {
+                    query.append("ds", key);
+                }
+            });
+        }
+
+        this.setState({ loading: true }, () => {
+            http.request(`/api/measure/result/report?${query}`).then(
+                data  => this.setState({ data, loading: false }),
+                error => this.setState({ error, loading: false })
+            );
+        });
     }
 
     /**
@@ -192,11 +161,30 @@ class ReportPage extends React.Component
         this.loadData();
     }
 
+    componentDidUpdate(prevProps)
+    {
+        if (!this.state.loading) {
+
+            // Detect dataSource selection change
+            const prevDataSources = prevProps.dataSources || {};
+            for (const dsId in prevDataSources) {
+                const curDs = (this.props.dataSources || {})[dsId];
+                if (curDs.selected !== prevDataSources[dsId].selected) {
+                    return this.loadData();
+                }
+            }
+        }
+    }
+
     renderEditor()
     {
+        if (!this.state.data || !this.state.data.cohort_sql) {
+            return null;
+        }
+
         return (
             <SQLEditor
-                query={ QUERY }
+                query={ this.state.data.cohort_sql }
                 { ...this.props.ui.sqlEditor }
                 onHeightChange={ h => this.props.dispatch(setEditorHeight(h)) }
                 onQuery={ q => this.runQuery(q) }
@@ -204,17 +192,45 @@ class ReportPage extends React.Component
         );
     }
 
+    createSummaryRenderer()
+    {
+        if (!this.state.data) return null;
+
+        return (
+            <ReportSummary
+                clinic="All Clinics"
+                date={ this.state.data.measureDate }
+                measureName={ this.state.data.measureName }
+                startValue={ this.state.numeratorValue }
+                numeratorValue={ this.state.data.numeratorValue }
+                denominatorValue={ this.state.data.denominatorValue }
+                measureDescription={ this.state.data.measureDescription || "No description available for this measure" }
+                numeratorDescription={ this.state.data.numeratorDescription || "No description available for the numerator of this measure"   }
+                denominatorDescription={ this.state.data.denominatorDescription || "No description available for the denominator of this measure" }
+            />
+        );
+    }
+
     render()
     {
-      
-        const { error, loading, prestoError, prestoData, prestoLoading, queryTime, query } = this.state;
+        const {
+            error,
+            // loading,
+            prestoError,
+            prestoData,
+            prestoLoading,
+            queryTime,
+            query
+        } = this.state;
+
         if ( error ) {
             console.error(error);
-            return <b>{ error.message }</b>
+            return <b>{ error.message }</b>;
         }
-        if ( loading ) {
-            return <b>Loading...</b>
-        }
+
+        // if ( loading ) {
+        //     return <b>Loading...</b>;
+        // }
 
         return (
             <div>
@@ -222,36 +238,35 @@ class ReportPage extends React.Component
                     <Sidebar/>
                     <div className="col-9">
                         <div className="row">
-                          <div className="col-6 align-middle">
-                              <h3 style={{ lineHeight: "43px", margin: 0 }}>
-                                  <Route path="/report" exact render={() => "Month Report" }/>
-                                  <Route path="/report/editor" render={() => "Cohort Builder"} />
-                              </h3>
-                          </div>
-                          <div className="col-6 text-right">
-                              <div className="btn-group view-toggle" role="group">
-                                  <NavLink className="btn btn-brand" to={{
-                                      pathname: "/report",
-                                      search  : this.props.location.search
-                                  }} exact>REPORT</NavLink>
-                                  <NavLink className="btn btn-brand" to={{
-                                      pathname: "/report/editor",
-                                      search  : this.props.location.search
-                                  }}>BUILDER</NavLink>
-                              </div>
-                          </div>
+                            <div className="col-6 align-middle">
+                                <h3 style={{ lineHeight: "43px", margin: 0 }}>
+                                    <Route path="/report" exact render={() => "Month Report" }/>
+                                    <Route path="/report/editor" render={() => "Cohort Builder"} />
+                                </h3>
+                            </div>
+                            <div className="col-6 text-right">
+                                <div className="btn-group view-toggle" role="group">
+                                    <NavLink className="btn btn-brand" to={{
+                                        pathname: "/report",
+                                        search  : this.props.location.search
+                                    }} exact>REPORT</NavLink>
+                                    <NavLink className="btn btn-brand" to={{
+                                        pathname: "/report/editor",
+                                        search  : this.props.location.search
+                                    }} exact>BUILDER</NavLink>
+                                </div>
+                            </div>
                         </div>
                         <br/>
-                        <Route path="/report" exact component={ReportSummary}/>
-                        <Route path="/report/editor" render={() => this.renderEditor()} />
+                        <Route path="/report"        exact render={() => this.createSummaryRenderer()}/>
+                        <Route path="/report/editor" exact render={() => this.renderEditor()} />
                         {
                             queryTime ?
-                            <div className="float-right" style={{ marginTop: "-4em", fontSize: 11, color: "#999", textAlign: "right" }}>
-                                    Total time: { formatDuration(queryTime) }<br/>
-                                {/* { !prestoLoading && prestoData && prestoData.processedRows ? "Processed rows: " + String(prestoData.processedRows).replace(/\d(?=(\d{3})+$)/g, '$&,') : "" }<br/> */}
-                                { !prestoLoading && prestoData ? "Result rows: " + prestoData.data.length : "" }
-                            </div> :
-                            null
+                                <div className="float-right" style={{ marginTop: "-4em", fontSize: 11, color: "#999", textAlign: "right" }}>
+                                        Total time: { formatDuration(queryTime) }<br/>
+                                    { !prestoLoading && prestoData ? "Result rows: " + prestoData.data.length : "" }
+                                </div> :
+                                null
                         }
                         <br/>
                         <br/>
@@ -260,11 +275,12 @@ class ReportPage extends React.Component
                                 <div className="alert alert-info">Loading...</div> :
                                 prestoError ?
                                     <div className="alert alert-danger">{ prestoError.message }</div> :
-                                    prestoData ?
-                                        <DataGrid data={ prestoData } query={query}/> :
-                                        <div className="alert alert-info">No data to display</div>
+                                    prestoData === undefined ?
+                                        null :
+                                        prestoData && prestoData.data && prestoData.data.length ?
+                                            <DataGrid data={ prestoData } query={query}/> :
+                                            <div className="alert alert-info">No data to display</div>
                         }
-                        
                         <br/>
                     </div>
                 </div>
@@ -274,7 +290,8 @@ class ReportPage extends React.Component
 }
 
 export default connect(
-  state => ({
-    ui: state.ui
-  })
+    state => ({
+        ui: state.ui,
+        dataSources: state.dataSources
+    })
 )(ReportPage);
