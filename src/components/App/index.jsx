@@ -1,26 +1,34 @@
-import React                    from "react";
-import { BrowserRouter } from "react-router-dom";
+import React               from "react";
+import { BrowserRouter }   from "react-router-dom";
 import { Route, Redirect } from "react-router-dom";
-import Header                   from "../Header";
-import ReportPage               from "../ReportPage";
-import MeasuresPage             from "../MeasuresPage";
-import LoginPage                from "../LoginPage";
-import                               "./App.scss";
-// import { Provider }             from "react-redux";
-// import store                    from "../../store";
-import { connect } from "react-redux";
+import { connect }         from "react-redux";
+import PropTypes           from "prop-types";
+import Header              from "../Header";
+import ReportPage          from "../ReportPage";
+import MeasuresPage        from "../MeasuresPage";
+import LoginPage           from "../LoginPage";
+import                          "./App.scss";
 
-function PrivateRoute({ user, component: Component, ...rest }) {
-    return (
-        <Route {...rest} render={ props => (
-            user ?
-                <Component {...props} /> :
-                <Redirect to={{
-                    pathname: "/login",
-                    state: { from: props.location }
-                }} />
-        ) } />
-    );
+class PrivateRoute extends React.Component
+{
+    static propTypes = {
+        user: PropTypes.object,
+        component: PropTypes.any
+    };
+
+    render() {
+        const { user, component: Component, ...rest } = this.props;
+        return (
+            <Route {...rest} render={ props => (
+                user ?
+                    <Component {...props} /> :
+                    <Redirect to={{
+                        pathname: "/login",
+                        state: { from: props.location }
+                    }} />
+            ) } />
+        );
+    }
 }
 
 function CPR(props) {
@@ -34,22 +42,28 @@ function CPR(props) {
 
 class App extends React.Component
 {
+    static propTypes = {
+        user: PropTypes.object,
+        loading: PropTypes.bool,
+        dispatch: PropTypes.func
+    };
+
     render() {
         return (
             <BrowserRouter>
-            <div className="App">
-                <Header
-                    user={ this.props.user }
-                    loading={ this.props.loading }
-                    dispatch={ this.props.dispatch }
-                />
-                <div className="container" style={{ marginTop: 30 }}>
-                    <CPR path="/"         component={ReportPage} exact />
-                    <CPR path="/report"   component={ReportPage} />
-                    <CPR path="/measures" component={MeasuresPage} />
-                    <Route path="/login"  component={LoginPage} />
+                <div className="App">
+                    <Header
+                        user={ this.props.user }
+                        loading={ this.props.loading }
+                        dispatch={ this.props.dispatch }
+                    />
+                    <div className="container" style={{ marginTop: 30 }}>
+                        <CPR path="/"           component={ReportPage} exact />
+                        <CPR path="/report"     component={ReportPage} />
+                        <CPR path="/measures"   component={MeasuresPage} />
+                        <Route path="/login"    component={LoginPage} />
+                    </div>
                 </div>
-            </div>
             </BrowserRouter>
         );
     }
