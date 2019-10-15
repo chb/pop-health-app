@@ -12,38 +12,50 @@ class Sidebar extends React.Component
         toggleDataSource: PropTypes.func.isRequired
     };
 
-    renderCheckBoxes()
+    render()
     {
-        const out = [];
+        const ehr   = [];
+        const claim = [];
 
         for (const id in this.props.dataSources) {
             const meta = this.props.dataSources[id];
 
-            out.push(
+            const node = (
                 <Checkbox
-                    key={ id } 
+                    key={ id }
                     label={ meta.label }
-                    checked={ meta.enabled }
+                    checked={ !!meta.selected }
+                    disabled={ !meta.enabled }
                     onChange={ () => this.props.toggleDataSource(id) }
+                    radio={ meta.type === "claims" }
                 />
             );
+
+            if (meta.type === "ehr") {
+                ehr.push(node);
+            }
+            else if (meta.type === "claims") {
+                claim.push(node);
+            }
         }
 
-        return out;
-    }
-
-    render() {
         return (
             <div>
-                <h6 className="data-sources-title">DATA SOURCES</h6>
-                { this.renderCheckBoxes() }
+                <h6 className="data-sources-title">EHR DATA SOURCES</h6>
+                { ehr }
+                <br/>
+                <br/>
+                <h6 className="data-sources-title">CLAIMS DATA SOURCE</h6>
+                { claim }
             </div>
         );
     }
 }
 
 export default connect(
-    state => ({ dataSources: state.dataSources }),
+    state => ({
+        dataSources: { ...state.dataSources }
+    }),
     dispatch => ({
         toggleDataSource: id => dispatch(toggleDataSource(id))
     })
