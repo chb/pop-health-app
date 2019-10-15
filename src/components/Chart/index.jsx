@@ -18,38 +18,64 @@ export default class Chart extends React.Component
     };
 
     static defaultProps = {
-        duration: 1600,
+        duration: 1200,
         easing  : "easeInOutExpo"
     };
 
     constructor(props) {
         super(props);
-        this.state = { numerator: 0 };
+        this.state = { numerator: 0, denominator: 1 };
     }
 
     componentDidMount() {
-        window.jQuery({ numerator: 0 }).animate(
-            {
-                numerator: this.props.numerator
-            },
-            {
-                duration: this.props.duration,
-                easing  : this.props.easing,
-                step: numerator => this.setState({ numerator })
-            }
-        );
+        this.setState({ animating: true }, () => {
+            window.jQuery({ numerator: 0, denominator: this.props.denominator }).animate(
+                {
+                    numerator  : this.props.numerator,
+                    denominator: this.props.denominator
+                },
+                {
+                    duration: this.props.duration,
+                    easing  : this.props.easing,
+                    step: (now, tween) => this.setState({ [tween.prop]: now }),
+                    complete: () => this.setState({ animating: false })
+                }
+            );
+        });
+    }
+
+    componentDidUpdate() {
+        if (!this.state.animating && this.state.numerator !== this.props.numerator) {
+            this.setState({ animating: true }, () => {
+                window.jQuery({
+                    numerator: this.state.numerator,
+                    denominator: this.state.denominator
+                }).animate(
+                    {
+                        numerator  : this.props.numerator,
+                        denominator: this.props.denominator
+                    },
+                    {
+                        duration: this.props.duration,
+                        easing  : this.props.easing,
+                        step: (now, tween) => this.setState({ [tween.prop]: now }),
+                        complete: () => this.setState({ animating: false })
+                    }
+                );
+            });
+        }
     }
 
     render() {
-        const percent = Math.max(Math.min(this.state.numerator / this.props.denominator * 100, 100), 0);
+        const percent = Math.max(Math.min(this.state.numerator / this.state.denominator * 100, 100), 0);
         const largeArcFlag = percent >= 50 ? 1 : 0;
-        const [x, y] = getCoordinatesForPercent(percent/100);
+        const [x, y] = getCoordinatesForPercent(percent / 100);
         return (
             <svg className="chart" viewBox="-110 -110 220 220">
                 <text className="chart-big-text" y={0}>{Math.round(percent)}%</text>
                 {
                     <text className="chart-small-text" y={35}>
-                        {Math.round(this.state.numerator)}/{this.props.denominator}
+                        {Math.round(this.state.numerator)}/{Math.round(this.state.denominator)}
                     </text>
                 }
                 {
