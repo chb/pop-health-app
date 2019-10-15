@@ -1,11 +1,18 @@
-import React       from "react";
-// import { connect } from "react-redux";
-import { NavLink } from "react-router-dom";
-import logo        from "./logo.png";
-import { logout }  from "../../store/auth";
-import                  "./Header.scss";
+import React              from "react";
+import PropTypes          from "prop-types";
+import { NavLink, Route } from "react-router-dom";
+import logo               from "./logo.png";
+import { logout }         from "../../store/auth";
+import                         "./Header.scss";
 
 export default class Header extends React.Component {
+
+    static propTypes = {
+        user    : PropTypes.object,
+        dispatch: PropTypes.func,
+        loading : PropTypes.bool
+    };
+
     render() {
         return (
             <header className="app-header navbar navbar-expand-lg">
@@ -18,24 +25,33 @@ export default class Header extends React.Component {
                     { this.props.user && (
                         <>
                             <ul className="navbar-nav justify-content-center">
-                                <li className="nav-item">
-                                    <NavLink className="nav-link" to="/measures">Measures</NavLink>
-                                </li>
-                                <li className="nav-item">
-                                    <NavLink className="nav-link" to="/report">Report</NavLink>
-                                </li>
+                                <Route path="/measures" render={() => (
+                                    <li className="nav-item">
+                                        <b className="nav-link active">Measures</b>
+                                    </li>
+                                )} />
+                                <Route path="/report" render={() => (
+                                    <>
+                                        <li className="nav-item">
+                                            <NavLink className="nav-link" to="/measures">Measures</NavLink>
+                                        </li>
+                                        <li className="nav-item">
+                                            <b className="nav-link active">Report</b>
+                                        </li>
+                                    </>
+                                )} />
                             </ul>
                             <ul className="navbar-nav">
                                 <li className="nav-item text-right">
                                     <a className="nav-link" onClick={e => {
                                         e.preventDefault();
                                         this.props.dispatch(logout());
-                                     }} href="/login">
+                                    }} href="/login">
                                         <i className={
                                             "fas fa-power-off" + (
                                                 this.props.loading ? " fa-spin" : ""
                                             )
-                                         } style={{ color: "#FA0" }}/> Logout
+                                        } style={{ color: "#FA0" }}/> Logout
                                     </a>
                                 </li>
                             </ul>
@@ -46,8 +62,3 @@ export default class Header extends React.Component {
         );
     }
 }
-
-// connect(
-//     state => ({}),
-//     dispatch => ({ logout: () => dispatch(logout()) })
-// )(Header);
