@@ -8,7 +8,7 @@ export function toggle(id) {
 
         const oldState = getState();
         const payer = oldState.payers[id];
-        const correspondingClaimsDataSourceId = payer.dataSource;
+        const correspondingClaimsDataSourceId = payer.ds_id;
 
         if (!payer.selected) {
             dispatch(selectClaimsDataSource(correspondingClaimsDataSourceId));

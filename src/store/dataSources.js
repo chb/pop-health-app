@@ -30,7 +30,7 @@ export function load(data)
             if (rec.type === "claims") {
                 enabled = false;
                 const payerId = Object.keys(oldState.payers).find(
-                    id => oldState.payers[id].dataSource === rec.id
+                    id => oldState.payers[id].ds_id === rec.id
                 );
 
                 if (!payerId || oldState.payers[payerId].selected) {

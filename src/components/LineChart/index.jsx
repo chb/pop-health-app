@@ -1,5 +1,6 @@
 import React     from "react";
 import PropTypes from "prop-types";
+import moment from "moment";
 
 const Highcharts = window.Highcharts;
 
@@ -14,14 +15,29 @@ export default class LineChart extends React.Component
             "Roboto,\"Helvetica Neue\",Arial,sans-serif,\"Apple Color Emoji\"" +
             ",\"Segoe UI Emoji\",\"Segoe UI Symbol\"";
 
-        this.chart = window.Highcharts.chart("container", window.jQuery.extend(true, {
+        this.chart = window.Highcharts.chart("container", {
             chart: {
                 type               : "spline",
                 borderWidth        : 1,
                 borderColor        : "#EEE",
                 plotBackgroundColor: "#F6F6F6",
-                plotBorderColor    : "#EEE",
-                plotBorderWidth    : 1
+                plotBorderColor    : "#DDD",
+                plotBorderWidth    : 1,
+                zoomType: "x"
+            },
+            drilldown: {
+                allowPointDrilldown: false,
+                drillUpButton: {
+                    text: "This is a test",
+                    position: {
+                        x: 0,
+                        y: -35
+                    },
+                    theme: {
+                        "stroke-width": 2,
+                        stroke: "#4a90e2"
+                    }
+                }
             },
             title: {
                 align: "center",
@@ -39,24 +55,59 @@ export default class LineChart extends React.Component
                     fontWeight: 300
                 }
             },
-            xAxis: {
-                lineWidth : 0,
-                crosshair : true,
-                categories: [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ]
-            },
+            xAxis: [
+                {
+                    lineWidth : 0,
+                    crosshair : true,
+                    type      : "category",
+                    id        : "year_axis",
+                    showEmpty : false,
+                    categories: [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ],
+                    plotLines : [
+                        {
+                            value: moment().month(),
+                            zIndex: 2,
+                            color: "rgba(200, 0, 0, 0.5)",
+                            dashStyle: "ShortDash"
+                        }
+                    ],
+                    title: {
+                        text: null
+                    }
+                },
+                {
+                    lineWidth : 0,
+                    id        : "monthAxis",
+                    crosshair : true,
+                    type      : "datetime",
+                    minorTicks: true,
+                    showEmpty : false,
+                    zoomEnabled: true,
+                    min       : +moment().utc().startOf("month"),
+                    max       : +moment().utc().endOf("month").startOf("day"),
+                    dateTimeLabelFormats: {
+                        day: "%e"
+                    },
+                    title: {
+                        text: null
+                    }
+                }
+            ],
             yAxis: {
+                id: "pct_axis",
                 title: {
                     text: "% Patients",
                     style: {
                         fontFamily,
                         fontSize  : "1rem",
-                        fontWeight: 300
+                        fontWeight: 500
                     }
                 },
                 lineColor   : "#CCC",
                 tickInterval: 25,
                 min         : 0,
-                max         : 100
+                max         : 100,
+                lineWidth   : 0
             },
             tooltip: {
                 crossHairs   : true,
@@ -81,33 +132,40 @@ export default class LineChart extends React.Component
                     }
                 }
             },
-            series: [{
-                name  : "Current Year",
-                color : "#4a90e2",
-                type  : "areaspline",
-                shadow: true,
-                fillColor: {
-                    linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
-                    stops: [
-                        [
-                            0,
-                            Highcharts.color("#4a90e2").setOpacity(0.35).get()
-                        ],
-                        [
-                            1,
-                            Highcharts.color("#4a90e2").setOpacity(0).get()
+            series: [
+                {
+                    name  : "Current Year",
+                    id    : "current_year",
+                    color : "#4a90e2",
+                    type  : "areaspline",
+                    xAxis : "year_axis",
+                    shadow: true,
+                    fillColor: {
+                        linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
+                        stops: [
+                            [
+                                0,
+                                Highcharts.color("#4a90e2").setOpacity(0.35).get()
+                            ],
+                            [
+                                1,
+                                Highcharts.color("#4a90e2").setOpacity(0).get()
+                            ]
                         ]
-                    ]
+                    },
+                    marker: {
+                        enabled: false
+                    }
                 },
-                marker: {
-                    enabled: false
+                {
+                    name     : "Previous Year",
+                    id       : "previous_year",
+                    color    : "#555",
+                    dashStyle: "ShortDot",
+                    xAxis    : "year_axis",
+                    lineWidth: 2
                 }
-            }, {
-                name     : "Previous Year",
-                color    : "#555",
-                dashStyle: "ShortDot",
-                lineWidth: 2
-            }],
+            ],
             navigation: {
                 menuItemStyle: {
                     fontSize: "10px"
@@ -116,16 +174,19 @@ export default class LineChart extends React.Component
             legend: {
                 align        : "left",
                 verticalAlign: "top",
-                layout       : "vertical",
+                layout       : "horizontal",
                 floating     : true,
                 x            : 60,
                 y            : 58
             },
-        }, this.props.chartOptions));
+        });
+
+        this.chart.update(this.props.chartOptions, true, true, false);
     }
 
-    componentDidUpdate(/*prevProps, prevState*/) {
-        this.chart.update(this.props.chartOptions);
+    componentDidUpdate() {
+        this.chart.drillUp();
+        this.chart.update(this.props.chartOptions, true, true);
     }
 
     render() {
