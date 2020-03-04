@@ -11,7 +11,7 @@ export default class Root extends React.Component
     render() {
         return (
             <BrowserRouter>
-                <Provider store={ store }>            
+                <Provider store={ store }>
                     <App/>
                 </Provider>
             </BrowserRouter>
