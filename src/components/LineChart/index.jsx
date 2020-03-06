@@ -1,6 +1,7 @@
 import React     from "react";
 import PropTypes from "prop-types";
-import moment from "moment";
+import moment    from "moment";
+import                "./LineChart.scss";
 
 const Highcharts = window.Highcharts;
 
@@ -18,8 +19,6 @@ export default class LineChart extends React.Component
         this.chart = window.Highcharts.chart("container", {
             chart: {
                 type               : "spline",
-                borderWidth        : 1,
-                borderColor        : "#EEE",
                 plotBackgroundColor: "#F6F6F6",
                 plotBorderColor    : "#DDD",
                 plotBorderWidth    : 1,
@@ -190,10 +189,6 @@ export default class LineChart extends React.Component
     }
 
     render() {
-        return <div id="container" style={{
-            width       : "100%",
-            height      : 240,
-            marginBottom: 15
-        }}/>;
+        return <div id="container"/>;
     }
 }
