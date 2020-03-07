@@ -1,14 +1,11 @@
-import React                     from "react";
-import PropTypes                 from "prop-types";
-import { connect }               from "react-redux";
-import moment                    from "moment";
-import Sidebar                   from "../Sidebar";
-import Dropdown                  from "../Dropdown";
-import TimelineGrid              from "../TimelineGrid";
-import LineChart                 from "../LineChart";
-import { toggle as toggleOrg   } from "../../store/organizations";
-import { toggle as togglePayer } from "../../store/payers";
-import { queryMeasures }         from "../../store/measureResults";
+import React             from "react";
+import PropTypes         from "prop-types";
+import { connect }       from "react-redux";
+import moment            from "moment";
+import Sidebar           from "../Sidebar";
+import TimelineGrid      from "../TimelineGrid";
+import LineChart         from "../LineChart";
+import { queryMeasures } from "../../store/measureResults";
 
 const Highcharts = window.Highcharts;
 
@@ -135,7 +132,12 @@ class MeasuresPage extends React.Component
             orgId = Object.keys(this.props.data.organizations).shift();
         }
 
-        const org = this.props.data.organizations[orgId];
+        let org = this.props.data.organizations[orgId];
+
+        if (!org) {
+            orgId = Object.keys(this.props.data.organizations).shift();
+            org = this.props.data.organizations[orgId];
+        }
 
         let measure;
 
@@ -336,12 +338,7 @@ class MeasuresPage extends React.Component
         return (
             <>
                 <LineChart key="line-chart" chartOptions={ this.getChartOptions(orgId, org, measure) }/>
-                <div style={{
-                    maxHeight: "calc(100vh - 210px)",
-                    overflow: "auto"
-                }}>
-                    { reports }
-                </div>
+                { reports }
             </>
         );
     }
@@ -352,50 +349,6 @@ class MeasuresPage extends React.Component
             <div className="row">
                 <Sidebar/>
                 <div className="col-9">
-                    <div className="row align-items-center">
-                        <div className="col">
-                            <div className="row">
-                                <div className="col">
-                                    <label>Payer</label>
-                                    <Dropdown
-                                        label="All Payers"
-                                        value={ null }
-                                        onSelect={id => this.props.dispatch(togglePayer(id))}
-                                        options={this.props.payers}
-                                    />
-                                </div>
-                                <div className="col">
-                                    <label>Organization</label>
-                                    <Dropdown
-                                        multiple
-                                        label="Organizations"
-                                        onSelect={id => this.props.dispatch(toggleOrg(id))}
-                                        options={this.props.organizations}
-                                    />
-                                </div>
-                                <div className="col">
-                                    <label>Clinic</label>
-                                    <Dropdown
-                                        label="All Clinics"
-                                        value={ null }
-                                        onSelect={() => 1}
-                                        options={[
-                                            {
-                                                label: "All Clinics",
-                                                description: "Show results from all clinics",
-                                                value: null
-                                            }
-                                        ]}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-3 align-self-end">
-                            <br/>
-                            <button className="btn btn-brand active btn-block">Update</button>
-                        </div>
-                    </div>
-                    <br/>
                     { this.renderStage() }
                 </div>
             </div>
