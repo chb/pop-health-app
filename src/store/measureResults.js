@@ -18,7 +18,7 @@ const MERGE       = "actions:measureResults:merge";
  * If any of the needed variables are missing (E.g. not available yet), it
  * will return null.
  */
-export function getQueryUri(state, { org, payer, clinic, ds } = {})
+export function getQueryUri(state, { org, payer, ds } = {})
 {
     let q = new URLSearchParams();
 
@@ -43,9 +43,6 @@ export function getQueryUri(state, { org, payer, clinic, ds } = {})
             return true;
         });
     }
-
-    // Clinics -----------------------------------------------------------------
-    // TODO
 
     // Data Sources ------------------------------------------------------------
     if (ds) {

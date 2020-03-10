@@ -24,6 +24,7 @@
 }
 .data-grid-body {
   overflow: auto;
+  overflow: overlay;
   max-height: 300px;
   // position: relative;
   border: 1px solid;

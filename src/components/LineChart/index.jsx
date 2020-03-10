@@ -24,30 +24,19 @@ export default class LineChart extends React.Component
                 plotBorderWidth    : 1,
                 zoomType: "x"
             },
-            drilldown: {
-                allowPointDrilldown: false,
-                drillUpButton: {
-                    text: "This is a test",
-                    position: {
-                        x: 0,
-                        y: -35
-                    },
-                    theme: {
-                        "stroke-width": 2,
-                        stroke: "#4a90e2"
-                    }
-                }
-            },
             title: {
                 align: "center",
                 style: {
                     fontFamily,
-                    fontSize  : "1.5rem",
+                    // fontSize  : "1.5rem",
+                    fontSize  : "calc(8px + 1vw)",
                     fontWeight: 500
-                }
+                },
+                useHTML: true
             },
             subtitle: {
                 align: "center",
+                useHTML: true,
                 style: {
                     fontFamily,
                     fontSize  : "1rem",
@@ -62,14 +51,6 @@ export default class LineChart extends React.Component
                     id        : "year_axis",
                     showEmpty : false,
                     categories: [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ],
-                    plotLines : [
-                        {
-                            value: moment().month(),
-                            zIndex: 2,
-                            color: "rgba(200, 0, 0, 0.5)",
-                            dashStyle: "ShortDash"
-                        }
-                    ],
                     title: {
                         text: null
                     }

@@ -2,12 +2,12 @@ import React             from "react";
 import PropTypes         from "prop-types";
 import { connect }       from "react-redux";
 import moment            from "moment";
+import config            from "../../config";
 import Sidebar           from "../Sidebar";
 import TimelineGrid      from "../TimelineGrid";
 import LineChart         from "../LineChart";
 import { queryMeasures } from "../../store/measureResults";
 
-const Highcharts = window.Highcharts;
 
 class MeasuresPage extends React.Component
 {
@@ -150,128 +150,38 @@ class MeasuresPage extends React.Component
         return { orgId, org, measure };
     }
 
-    getChartOptions(orgId, orgData, measure) {
+    getChartOptions(orgData, measure) {
         const series = [
             {
-                data: [],
-                id  : "current_year",
-                name: "Current Year",
+                data : [],
+                id   : "current_year",
+                name : config.startYear + 1,
                 xAxis: "year_axis"
             },
             {
-                data: [],
-                id  : "previous_year",
-                name: "Previous Year",
+                data : [],
+                id   : "previous_year",
+                name : config.startYear,
                 xAxis: "year_axis"
             }
         ];
-
-        const now = moment().utc();
-        const thisYear = now.format("YYYY");
-        const thisMonth = now.month();
-
-        let lastPct = 0;
-        let lastPct2 = 0;
 
         Object.keys(measure.data).forEach(key => {
             const [ year, month ] = key.split("-");
             const rec = measure.data[key];
             const point = {
-                x: month * 1 - 1,
+                x: parseInt(month, 10) - 1,
                 y: rec.pct,
                 name : moment(key).format("MMMM"),
                 xAxis: 0
             };
-            if (year === thisYear) {
+            if (year === String(config.startYear + 1)) {
                 series[0].data.push(point);
-
-                if (month * 1 === thisMonth) {
-                    lastPct = rec.pct;
-                    // point.drilldown = "Month";
-                }
             }
-            else if (year * 1 === thisYear - 1) {
-                if (+month - 1 === thisMonth) {
-                    point.drilldown = "Month_last_year";
-                    lastPct2 = rec.pct;
-                }
+            else if (year === String(config.startYear)) {
                 series[1].data.push(point);
             }
         });
-
-        // Add some extra points for the current month
-        series[0].data.push({
-            x: thisMonth,
-            y: lastPct + 6 - (6 *  Math.random()),
-            xAxis: 0,
-            name: moment().format("MMMM"),
-            color: "#900",
-            drilldown: "Month"
-        });
-
-        // Set up the drill-down data for the last month
-        let day1 = moment().utc().startOf("month");
-        const drilldownSeries1 = {
-            id    : "Month",
-            name  : moment().format("MMMM YYYY"),
-            data  : [],
-            type  : "areaspline",
-            xAxis : 1,
-            color : "rgb(200, 100, 100)",
-            shadow: true,
-            fillColor: {
-                linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
-                stops: [
-                    [
-                        0,
-                        Highcharts.color("rgb(200, 100, 100)").setOpacity(0.35).get()
-                    ],
-                    [
-                        1,
-                        Highcharts.color("#4a90e2").setOpacity(0).get()
-                    ]
-                ]
-            },
-            marker: {
-                enabled: false
-            }
-        };
-
-        const drilldownSeries2 = {
-            name     : moment().subtract(1, "year").format("MMMM YYYY"),
-            id       : "Month_last_year",
-            xAxis    : 1,
-            data     : [],
-            dashStyle: "ShortDot",
-            color    : "#555",
-            lineWidth: 2,
-            marker: {
-                enabled: false
-            }
-        };
-
-        const diff = lastPct2 - lastPct;
-
-        while (day1.isSameOrBefore(moment(now).endOf("month"), "day")) {
-            if (day1.isSame(moment(now).endOf("month"), "day")) {
-                drilldownSeries2.data.push({
-                    x: +day1,
-                    y: lastPct2
-                });
-            } else {
-                drilldownSeries2.data.push({
-                    x: +day1,
-                    y: lastPct + diff * Math.random()
-                });
-            }
-            if (day1.isSameOrBefore(now, "day")) {
-                drilldownSeries1.data.push({
-                    x: +day1,
-                    y: lastPct + diff - diff * 2 * Math.random()
-                });
-            }
-            day1.add(1, "day");
-        }
 
         return {
             title: {
@@ -280,15 +190,12 @@ class MeasuresPage extends React.Component
             subtitle: {
                 text: orgData.description
             },
-            series,
-            drilldown: {
-                series: [ drilldownSeries1, drilldownSeries2 ]
-            }
+            series
         };
     }
 
     // Event Handlers ----------------------------------------------------------
-    onRowClick(orgId, orgData, measure)
+    onRowClick(orgId, measure)
     {
         this.setState({
             selection: {
@@ -328,7 +235,7 @@ class MeasuresPage extends React.Component
                     data={ orgData }
                     org={ org }
                     orgId={ id }
-                    onRowClick={ msr => this.onRowClick(id, orgData, msr) }
+                    onRowClick={ msr => this.onRowClick(id, msr) }
                     selectedOrgId={ orgId }
                     selectedMeasureId={ measure.id }
                 />
@@ -337,7 +244,7 @@ class MeasuresPage extends React.Component
 
         return (
             <>
-                <LineChart key="line-chart" chartOptions={ this.getChartOptions(orgId, org, measure) }/>
+                <LineChart key="line-chart" chartOptions={ this.getChartOptions(org, measure) }/>
                 { reports }
             </>
         );

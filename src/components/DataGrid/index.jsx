@@ -3,6 +3,22 @@ import React     from "react";
 import PropTypes from "prop-types";
 import                "./DataGrid.scss";
 
+function pad(input) {
+    while (input.length % 4) {
+        input += "=";
+    }
+    return input;
+}
+
+function base64UrlEncode(input) {
+    console.log(input);
+    console.log(btoa(input));
+    // return btoa(input);
+    return pad(btoa(input)).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_")
+        // .replace(/-/g, "+")
+        // .replace(/_/g, "/");
+}
+
 export default class RemoteDataGrid extends React.Component
 {
     static propTypes = {
@@ -24,7 +40,7 @@ export default class RemoteDataGrid extends React.Component
 
     buildCsvUrl()
     {
-        return "http://localhost:3003/sql/csv?q=" + btoa(this.props.query);
+        return "http://localhost:3003/sql/csv?q=" + base64UrlEncode(this.props.query);
     }
 
     render() {

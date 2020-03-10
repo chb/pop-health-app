@@ -5,7 +5,6 @@ import store                    from "./store";
 import App                   from "./components/App";
 
 
-
 export default class Root extends React.Component
 {
     render() {

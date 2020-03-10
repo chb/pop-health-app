@@ -3,6 +3,7 @@ import PropTypes         from "prop-types";
 import moment            from "moment";
 import { connect }       from "react-redux";
 import { Link }          from "react-router-dom";
+import config            from "../../config";
 import                        "./TimelineGrid.scss";
 
 
@@ -52,11 +53,14 @@ export class TimelineGrid extends React.Component
         /**
          * The dataSources included in this grid
          */
-        dataSources: PropTypes.object
+        dataSources: PropTypes.object,
+
+        startYear: PropTypes.number
     };
 
     static defaultProps = {
-        data: {}
+        data: {},
+        startYear: config.startYear
     };
 
     static contextTypes = {
@@ -66,9 +70,23 @@ export class TimelineGrid extends React.Component
     render() {
         const { description, name, measures } = this.props.data;
 
-        const headerLabels = [];
+        const headerLabels = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+        ];
+
         const bodyRows = [];
-        const now = moment();
+        const now = moment(config.startYear + 1 + "-01-01", "YYYY-MM-DD");
 
         // loop over each measure
         measures.forEach(measure => {
@@ -77,12 +95,8 @@ export class TimelineGrid extends React.Component
             let i = 0;
             for (let date in measure.data) {
 
-                const entry = measure.data[date];
+                const entry      = measure.data[date];
                 const dateObject = moment(date);
-                const month = dateObject.format("MMM");
-                if (headerLabels.indexOf(month) === -1) {
-                    headerLabels.push(month);
-                }
 
                 const title = `${dateObject.format("MMM YYYY")} - ${entry.numerator} of ${entry.denominator}`;
                 const pct = Math.round(entry.pct);
@@ -110,7 +124,7 @@ export class TimelineGrid extends React.Component
                 // Values from the previous year that do not yet have new data
                 // for the current year
                 else {
-                    const newDate = moment(dateObject).add(1, "year");
+                    const newDate = moment(dateObject).add(1, "year").format("YYYY-MM");
                     if (!measure.data[newDate]) {
                         cells[i % 12] = (
                             <td key={date} title={title}>
@@ -120,6 +134,23 @@ export class TimelineGrid extends React.Component
                     }
                 }
                 i++;
+            }
+
+            if (!cells.length) {
+                cells.push(
+                    <td key="empty-1">-</td>,
+                    <td key="empty-2">-</td>,
+                    <td key="empty-3">-</td>,
+                    <td key="empty-4">-</td>,
+                    <td key="empty-5">-</td>,
+                    <td key="empty-6">-</td>,
+                    <td key="empty-7">-</td>,
+                    <td key="empty-8">-</td>,
+                    <td key="empty-9">-</td>,
+                    <td key="empty-10">-</td>,
+                    <td key="empty-11">-</td>,
+                    <td key="empty-12">-</td>
+                );
             }
 
             bodyRows.push(
