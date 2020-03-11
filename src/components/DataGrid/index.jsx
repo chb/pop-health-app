@@ -11,12 +11,7 @@ function pad(input) {
 }
 
 function base64UrlEncode(input) {
-    console.log(input);
-    console.log(btoa(input));
-    // return btoa(input);
-    return pad(btoa(input)).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_")
-        // .replace(/-/g, "+")
-        // .replace(/_/g, "/");
+    return pad(btoa(input)).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
 }
 
 export default class RemoteDataGrid extends React.Component
