@@ -1,3 +1,9 @@
+# PopHealhApp
+
+### Notes
+- To trigger a back-end sync load the app and append `sync=1` to the URL.
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
