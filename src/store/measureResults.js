@@ -1,4 +1,5 @@
 import http from "../http";
+import cfg  from "../config";
 
 
 const INITIAL_STATE = {
@@ -22,7 +23,9 @@ export function getQueryUri(state, { org, payer, ds } = {})
 {
     let q = new URLSearchParams();
 
-    // console.log(state);
+    // Two year time range based on the startYear config -----------------------
+    q.append("startDate", `${cfg.startYear    }-01-01`);
+    q.append("endDate"  , `${cfg.startYear + 1}-12-31`);
 
     // payers ------------------------------------------------------------------
     if (payer) {
@@ -59,6 +62,21 @@ export function getQueryUri(state, { org, payer, ds } = {})
         return null;
     }
 
+    // If "sync" is added to the current window location, pass it through to the
+    // back-end to tell it to sync the data.
+    const url  = new URL(window.location.href);
+    const sync = url.searchParams.get("sync");
+
+    if (sync) {
+        q.append("sync", sync);
+
+        // Also make sure we remove "sync" from the URL after we have used it!
+        if (window.history.replaceState) {
+            url.searchParams.delete("sync");
+            window.history.replaceState({}, "", url.href);
+        }
+    }
+
     q = q.toString();
 
     if (!q) {
@@ -72,7 +90,6 @@ export function getQueryUri(state, { org, payer, ds } = {})
 export function queryMeasures(options = {})
 {
     return function(dispatch, getState) {
-
         const state = getState();
         const uri   = getQueryUri(state, options);
         if (uri && uri !== state.uri) {
