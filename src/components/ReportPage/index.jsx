@@ -115,7 +115,7 @@ class ReportPage extends React.Component
         }
 
         this.setState({ loading: true }, () => {
-            http.request(`/api/measure/result/report?${query}`).then(
+            http.request(`api/measure/result/report?${query}`).then(
                 data  => this.setState({ data, loading: false }),
                 error => this.setState({ error, loading: false })
             );
