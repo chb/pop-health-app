@@ -59,4 +59,4 @@ http.request("api/ui").then(data => {
     store.dispatch(loadPayers(data.payers));
     store.dispatch(loadMeasures(data.measures));
     store.dispatch(loadDataSources(data.dataSources));
-});
+}).catch(console.error);

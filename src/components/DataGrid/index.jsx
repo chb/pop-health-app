@@ -126,17 +126,11 @@ class DataGrid extends React.Component
         ));
 
         return (
-            <div ref={ this.wrapper }>
-                <div className="data-grid-header">
-                    <table className="table table-sm table-bordered table-hover data-grid">
-                        { header }
-                    </table>
-                </div>
-                <div className="data-grid-body">
-                    <table className="table table-sm table-bordered table-hover data-grid">
-                        <tbody>{ body }</tbody>
-                    </table>
-                </div>
+            <div ref={ this.wrapper } className="data-grid-wrapper">
+                <table className="table table-sm table-hover data-grid">
+                    { header }
+                    <tbody>{ body }</tbody>
+                </table>
             </div>
         )
     }

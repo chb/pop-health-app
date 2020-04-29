@@ -18,24 +18,18 @@ const MERGE       = "actions:measureResults:merge";
  * Compile and return the uri that will be used to query the measure results.
  * If any of the needed variables are missing (E.g. not available yet), it
  * will return null.
+ * @param {Object} state
+ * @param {Object} [options]
+ * @param {string} [options.org] Organization ID
+ * @param {string} [options.ds] Dataset ID
  */
-export function getQueryUri(state, { org, payer, ds } = {})
+export function getQueryUri(state, { org, ds } = {})
 {
     let q = new URLSearchParams();
 
     // Two year time range based on the startYear config -----------------------
     q.append("startDate", `${cfg.startYear    }-01-01`);
     q.append("endDate"  , `${cfg.startYear + 1}-12-31`);
-
-    // payers ------------------------------------------------------------------
-    if (payer) {
-        q.append("payer", payer);
-    } else {
-        Object.keys(state.payers).map(id => {
-            if (state.payers[id].selected) q.append("payer", id);
-            return true;
-        });
-    }
 
     // organizations -----------------------------------------------------------
     if (org) {
@@ -57,8 +51,8 @@ export function getQueryUri(state, { org, payer, ds } = {})
         });
     }
 
-    // payer and data source are required
-    if (!q.has("payer") || !q.has("ds")) {
+    // data source is required
+    if (!q.has("ds")) {
         return null;
     }
 
@@ -77,15 +71,14 @@ export function getQueryUri(state, { org, payer, ds } = {})
         }
     }
 
-    q = q.toString();
+    const qs = q.toString();
 
-    if (!q) {
+    if (!qs) {
         return null;
     }
 
-    return "/api/measure/result?" + q;
+    return "/api/measure/result?" + qs;
 }
-
 
 export function queryMeasures(options = {})
 {

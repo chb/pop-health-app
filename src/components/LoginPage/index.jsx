@@ -1,9 +1,9 @@
-import React       from "react";
-import PropTypes   from "prop-types";
-import { connect } from "react-redux";
+import React        from "react";
+import PropTypes    from "prop-types";
+import { connect }  from "react-redux";
 import { Redirect } from "react-router-dom";
-import logo        from "./logo.svg";
-import { login }   from "../../store/auth";
+import logo         from "./logo.svg";
+import { login }    from "../../store/auth";
 
 class LoginPage extends React.Component
 {

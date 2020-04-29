@@ -16,7 +16,22 @@ function http(uri, options) {
         mode: "cors",
         credentials: "include",
         ...options
-    }).then(res => res.json()).then(res => {
+    })
+    .then(res => {
+        if (!res.ok) {
+            const error = new Error(`${res.status} ${res.statusText}`);
+            Object.defineProperty(error, "data", {
+                value: {
+                    status    : res.status,
+                    statusText: res.statusText
+                }
+            });
+            throw error;
+        }
+        return res;
+    })
+    .then(res => res.json())
+    .then(res => {
         if (res.error) {
             throw new Error(res.error);
         }
