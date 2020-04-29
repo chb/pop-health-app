@@ -1,6 +1,7 @@
 import React     from "react";
 import PropTypes from "prop-types";
-import moment from "moment";
+import moment    from "moment";
+import                "./LineChart.scss";
 
 const Highcharts = window.Highcharts;
 
@@ -18,37 +19,24 @@ export default class LineChart extends React.Component
         this.chart = window.Highcharts.chart("container", {
             chart: {
                 type               : "spline",
-                borderWidth        : 1,
-                borderColor        : "#EEE",
                 plotBackgroundColor: "#F6F6F6",
                 plotBorderColor    : "#DDD",
                 plotBorderWidth    : 1,
                 zoomType: "x"
             },
-            drilldown: {
-                allowPointDrilldown: false,
-                drillUpButton: {
-                    text: "This is a test",
-                    position: {
-                        x: 0,
-                        y: -35
-                    },
-                    theme: {
-                        "stroke-width": 2,
-                        stroke: "#4a90e2"
-                    }
-                }
-            },
             title: {
                 align: "center",
                 style: {
                     fontFamily,
-                    fontSize  : "1.5rem",
+                    // fontSize  : "1.5rem",
+                    fontSize  : "calc(8px + 1vw)",
                     fontWeight: 500
-                }
+                },
+                useHTML: true
             },
             subtitle: {
                 align: "center",
+                useHTML: true,
                 style: {
                     fontFamily,
                     fontSize  : "1rem",
@@ -63,14 +51,6 @@ export default class LineChart extends React.Component
                     id        : "year_axis",
                     showEmpty : false,
                     categories: [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ],
-                    plotLines : [
-                        {
-                            value: moment().month(),
-                            zIndex: 2,
-                            color: "rgba(200, 0, 0, 0.5)",
-                            dashStyle: "ShortDash"
-                        }
-                    ],
                     title: {
                         text: null
                     }
@@ -190,10 +170,6 @@ export default class LineChart extends React.Component
     }
 
     render() {
-        return <div id="container" style={{
-            width       : "100%",
-            height      : 240,
-            marginBottom: 15
-        }}/>;
+        return <div id="container"/>;
     }
 }

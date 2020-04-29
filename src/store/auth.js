@@ -1,4 +1,4 @@
-import http from "../http"
+import http from "../http";
 
 const $ = window.jQuery;
 
@@ -23,7 +23,7 @@ export function merge(payload)
 
 export function login(email, password)
 {
-    return function (dispatch, getState)
+    return function (dispatch)
     {
         dispatch(setLoading(true));
         return http.login(email, password).then(user => {
@@ -42,7 +42,7 @@ export function login(email, password)
 
 export function logout()
 {
-    return function (dispatch, getState)
+    return function (dispatch)
     {
         dispatch(setLoading(true));
         return http.logout().then(() => {

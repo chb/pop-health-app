@@ -1,4 +1,5 @@
 import http from "../http";
+import cfg  from "../config";
 
 
 const INITIAL_STATE = {
@@ -17,22 +18,18 @@ const MERGE       = "actions:measureResults:merge";
  * Compile and return the uri that will be used to query the measure results.
  * If any of the needed variables are missing (E.g. not available yet), it
  * will return null.
+ * @param {Object} state
+ * @param {Object} [options]
+ * @param {string} [options.org] Organization ID
+ * @param {string} [options.ds] Dataset ID
  */
-export function getQueryUri(state, { org, payer, clinic, ds } = {})
+export function getQueryUri(state, { org, ds } = {})
 {
     let q = new URLSearchParams();
 
-    // console.log(state);
-
-    // payers ------------------------------------------------------------------
-    if (payer) {
-        q.append("payer", payer);
-    } else {
-        Object.keys(state.payers).map(id => {
-            if (state.payers[id].selected) q.append("payer", id);
-            return true;
-        });
-    }
+    // Two year time range based on the startYear config -----------------------
+    q.append("startDate", `${cfg.startYear    }-01-01`);
+    q.append("endDate"  , `${cfg.startYear + 1}-12-31`);
 
     // organizations -----------------------------------------------------------
     if (org) {
@@ -44,9 +41,6 @@ export function getQueryUri(state, { org, payer, clinic, ds } = {})
         });
     }
 
-    // Clinics -----------------------------------------------------------------
-    // TODO
-
     // Data Sources ------------------------------------------------------------
     if (ds) {
         q.append("ds", ds);
@@ -57,25 +51,38 @@ export function getQueryUri(state, { org, payer, clinic, ds } = {})
         });
     }
 
-    // payer and data source are required
-    if (!q.has("payer") || !q.has("ds")) {
+    // data source is required
+    if (!q.has("ds")) {
         return null;
     }
 
-    q = q.toString();
+    // If "sync" is added to the current window location, pass it through to the
+    // back-end to tell it to sync the data.
+    const url  = new URL(window.location.href);
+    const sync = url.searchParams.get("sync");
 
-    if (!q) {
+    if (sync) {
+        q.append("sync", sync);
+
+        // Also make sure we remove "sync" from the URL after we have used it!
+        if (window.history.replaceState) {
+            url.searchParams.delete("sync");
+            window.history.replaceState({}, "", url.href);
+        }
+    }
+
+    const qs = q.toString();
+
+    if (!qs) {
         return null;
     }
 
-    return "/api/measure/result?" + q;
+    return "/api/measure/result?" + qs;
 }
-
 
 export function queryMeasures(options = {})
 {
     return function(dispatch, getState) {
-
         const state = getState();
         const uri   = getQueryUri(state, options);
         if (uri && uri !== state.uri) {

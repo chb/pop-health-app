@@ -3,6 +3,17 @@ import React     from "react";
 import PropTypes from "prop-types";
 import                "./DataGrid.scss";
 
+function pad(input) {
+    while (input.length % 4) {
+        input += "=";
+    }
+    return input;
+}
+
+function base64UrlEncode(input) {
+    return pad(btoa(input)).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+}
+
 export default class RemoteDataGrid extends React.Component
 {
     static propTypes = {
@@ -24,7 +35,7 @@ export default class RemoteDataGrid extends React.Component
 
     buildCsvUrl()
     {
-        return "http://localhost:3003/sql/csv?q=" + btoa(this.props.query);
+        return "http://localhost:3003/sql/csv?q=" + base64UrlEncode(this.props.query);
     }
 
     render() {
@@ -115,17 +126,11 @@ class DataGrid extends React.Component
         ));
 
         return (
-            <div ref={ this.wrapper }>
-                <div className="data-grid-header">
-                    <table className="table table-sm table-bordered table-hover data-grid">
-                        { header }
-                    </table>
-                </div>
-                <div className="data-grid-body">
-                    <table className="table table-sm table-bordered table-hover data-grid">
-                        <tbody>{ body }</tbody>
-                    </table>
-                </div>
+            <div ref={ this.wrapper } className="data-grid-wrapper">
+                <table className="table table-sm table-hover data-grid">
+                    { header }
+                    <tbody>{ body }</tbody>
+                </table>
             </div>
         )
     }

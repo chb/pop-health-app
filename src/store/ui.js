@@ -4,7 +4,7 @@ const INITIAL_STATE = {
         options: {
             value: "",
             language: "sql",
-            lineNumbers: "off",
+            lineNumbers: "on",
             scrollBeyondLastLine: false,
             automaticLayout: true,
             emptySelectionClipboard: false,
@@ -16,7 +16,7 @@ const INITIAL_STATE = {
             mouseWheelZoom: true,
             renderLineHighlight: "all",
             minimap: {
-                enabled: true,
+                enabled: false,
                 renderCharacters: false
             }
         }
