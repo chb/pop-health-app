@@ -77,7 +77,7 @@ export function getQueryUri(state, { org, ds } = {})
         return null;
     }
 
-    return "/api/measure/result?" + qs;
+    return "api/measure/result?" + qs;
 }
 
 export function queryMeasures(options = {})
