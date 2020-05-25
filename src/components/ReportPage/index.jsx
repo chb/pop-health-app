@@ -116,7 +116,12 @@ class ReportPage extends React.Component
 
         this.setState({ loading: true }, () => {
             http.request(`api/measure/result/report?${query}`).then(
-                data  => this.setState({ data, loading: false }),
+                data  => {
+                    this.setState({ data, loading: false })
+                    if (data.cohort_sql) {
+                        this.runQuery(data.cohort_sql)
+                    }
+                },
                 error => this.setState({ error, loading: false })
             );
         });
@@ -182,13 +187,25 @@ class ReportPage extends React.Component
             return null;
         }
 
+        const { queryTime, prestoLoading, prestoData } = this.state;
+
         return (
+            <>
             <SQLEditor
                 query={ this.state.data.cohort_sql }
                 { ...this.props.ui.sqlEditor }
                 onHeightChange={ h => this.props.dispatch(setEditorHeight(h)) }
                 onQuery={ q => this.runQuery(q) }
             />
+            {
+                queryTime ?
+                    <div className="float-right" style={{ marginTop: "-4em", fontSize: 11, color: "#999", textAlign: "right" }}>
+                            Total time: { formatDuration(queryTime) }<br/>
+                        { !prestoLoading && prestoData ? "Result rows: " + prestoData.data.length : "" }
+                    </div> :
+                    null
+            }
+            </>
         );
     }
 
@@ -215,11 +232,9 @@ class ReportPage extends React.Component
     {
         const {
             error,
-            // loading,
             prestoError,
             prestoData,
             prestoLoading,
-            queryTime,
             query
         } = this.state;
 
@@ -227,10 +242,6 @@ class ReportPage extends React.Component
             console.error(error);
             return <b>{ error.message }</b>;
         }
-
-        // if ( loading ) {
-        //     return <b>Loading...</b>;
-        // }
 
         return (
             <div>
@@ -260,14 +271,6 @@ class ReportPage extends React.Component
                         <br/>
                         <Route path="/report"        exact render={() => this.createSummaryRenderer()}/>
                         <Route path="/report/editor" exact render={() => this.renderEditor()} />
-                        {
-                            queryTime ?
-                                <div className="float-right" style={{ marginTop: "-4em", fontSize: 11, color: "#999", textAlign: "right" }}>
-                                        Total time: { formatDuration(queryTime) }<br/>
-                                    { !prestoLoading && prestoData ? "Result rows: " + prestoData.data.length : "" }
-                                </div> :
-                                null
-                        }
                         <br/>
                         <br/>
                         {
@@ -281,6 +284,7 @@ class ReportPage extends React.Component
                                             <DataGrid data={ prestoData } query={query}/> :
                                             <div className="alert alert-info">No data to display</div>
                         }
+                        <br/>
                         <br/>
                     </div>
                 </div>
