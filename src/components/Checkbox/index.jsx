@@ -23,6 +23,7 @@ export default class Checkbox extends React.Component
             <label
                 className={"checkbox-label" + (this.props.checked ? " selected" : "") }
                 onClick={() => !this.props.disabled && this.props.onChange(!this.props.checked) }
+                // @ts-ignore
                 disabled={ !!this.props.disabled }
             >
                 <i className={ iconClass }/> { this.props.label }

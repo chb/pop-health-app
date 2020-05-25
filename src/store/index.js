@@ -16,24 +16,28 @@ import { load as loadDataSources   } from "./dataSources";
 
 const middleWares = [ thunk ];
 
-// Create logger middleware that will log all redux action but only
-// use that in development env.
+// Create logger middleware that will log all redux action but only use that in development.
 if (process.env.NODE_ENV === "development" && console && console.groupCollapsed) {
-    let logger = _store => next => action => {
-        let result;
-        if (!action.__no_log) {
-            console.groupCollapsed(action.type);
-            console.info("dispatching", action);
-            result = next(action);
-            console.log("next state", _store.getState());
-            console.groupEnd(action.type);
-        }
-        else {
-            result = next(action);
-        }
-        return result;
+    let logger = _store => {
+        return next => {
+            return action => {
+                let result;
+                if (!action.__no_log) {
+                    console.groupCollapsed(action.type);
+                    console.info("dispatching", action);
+                    result = next(action);
+                    console.log("next state", _store.getState());
+                    console.groupEnd();
+                }
+                else {
+                    result = next(action);
+                }
+                return result;
+            };
+        };
     };
 
+    // @ts-ignore
     middleWares.push(logger);
 }
 

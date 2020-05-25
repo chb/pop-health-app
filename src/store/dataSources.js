@@ -106,6 +106,7 @@ export default function reducer(state = {}, action)
         return { ...action.payload };
 
     case MERGE:
+        // @ts-ignore
         return window.jQuery.extend(true, state, action.payload);
 
     default:

@@ -1,4 +1,5 @@
 // This file contains the functions for communication with the backend.
+
 const { location, fetch } = window;
 
 const backendUrl = new URL(

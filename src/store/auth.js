@@ -1,5 +1,6 @@
 import http from "../http";
 
+// @ts-ignore
 const $ = window.jQuery;
 
 const INITIAL_STATE = {

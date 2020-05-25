@@ -40,7 +40,7 @@ export default class SQLEditor extends React.Component
                     value: this.props.query
                 });
 
-                // Row Resizer -----------------------------------------------------
+                // Row Resizer -------------------------------------------------
                 const $ = window.jQuery;
                 const $window = $(window);
                 const $editor = $(this.editorNode);

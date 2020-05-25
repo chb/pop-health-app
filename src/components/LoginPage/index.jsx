@@ -108,6 +108,7 @@ class LoginPage extends React.Component
 export default connect(
     state => state.auth,
     dispatch => ({
+        // @ts-ignore
         login: (email, pass) => dispatch(login(email, pass))
     })
 )(LoginPage);

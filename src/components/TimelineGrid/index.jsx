@@ -159,7 +159,14 @@ export class TimelineGrid extends React.Component
                     className={
                         (this.props.selectedOrgId === this.props.orgId &&
                          this.props.selectedMeasureId === measure.id) ? "selected" : "" }
-                    onClick={ e => { if (e.target.nodeName !== "A") this.props.onRowClick(measure); }}
+                    onClick={
+                        e => {
+                            // @ts-ignore
+                            if (e.target.nodeName !== "A") {
+                                this.props.onRowClick(measure);
+                            }
+                        }
+                    }
                 >
                     <th>{ measure.name }</th>
                     { cells }
