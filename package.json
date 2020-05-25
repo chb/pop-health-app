@@ -40,5 +40,6 @@
   "devDependencies": {
     "@types/react": "^16.9.23",
     "@types/react-redux": "^7.1.7"
-  }
+  },
+  "types": "typings/index.d.ts"
 }
