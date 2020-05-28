@@ -3,6 +3,10 @@ import React     from "react";
 import PropTypes from "prop-types";
 import                "./DataGrid.scss";
 
+const backendUrl = new URL(
+    `${window.location.protocol}//${process.env.REACT_APP_BACKEND_HOST}${process.env.REACT_APP_BACKEND_PATH}`
+);
+
 function pad(input) {
     while (input.length % 4) {
         input += "=";
@@ -35,7 +39,7 @@ export default class RemoteDataGrid extends React.Component
 
     buildCsvUrl()
     {
-        return "http://localhost:3003/sql/csv?q=" + base64UrlEncode(this.props.query);
+        return backendUrl + "sql/csv?q=" + base64UrlEncode(this.props.query);
     }
 
     render() {
