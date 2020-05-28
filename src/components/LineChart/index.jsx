@@ -157,7 +157,7 @@ export default class LineChart extends React.Component
                 layout       : "horizontal",
                 floating     : true,
                 x            : 60,
-                y            : 58
+                y            : 64
             },
         });
 
