@@ -34,6 +34,7 @@ a database, `cd` into the project directory and run:
 ```sh
 docker-compose -f docker/docker-compose.yml up
 ```
+Then just go to http://localhost:8080/
 
 ## License
 [Apache 2](LICENSE)
