@@ -16,6 +16,7 @@ services:
       DB_WAIT_FOR_CONNECTION: "true"
       DB_CONNECTION_LIMIT: 10
       DB_QUEUE_LIMIT: 0
+      NO_SQL_AUTH: 1
     depends_on:
       - database
 
