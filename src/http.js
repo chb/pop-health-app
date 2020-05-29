@@ -1,9 +1,10 @@
 // This file contains the functions for communication with the backend.
+import config from "./config"
 
 const { location, fetch } = window;
 
 const backendUrl = new URL(
-    `${location.protocol}//${process.env.REACT_APP_BACKEND_HOST}${process.env.REACT_APP_BACKEND_PATH}`
+    `${location.protocol}//${config.backendHost}${config.backendPath}`
 );
 
 function http(uri, options) {

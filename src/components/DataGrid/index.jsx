@@ -1,11 +1,10 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React     from "react";
 import PropTypes from "prop-types";
+import config    from "../../config";
 import                "./DataGrid.scss";
 
-const backendUrl = new URL(
-    `${window.location.protocol}//${process.env.REACT_APP_BACKEND_HOST}${process.env.REACT_APP_BACKEND_PATH}`
-);
+const backendUrl = `//${config.backendHost}${config.backendPath}`;
 
 function pad(input) {
     while (input.length % 4) {

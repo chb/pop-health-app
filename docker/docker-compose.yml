@@ -26,6 +26,9 @@ services:
       dockerfile: ./docker/Dockerfile
     ports:
       - "8080:80"
+    environment:
+      BACKEND_HOST: "0.0.0.0:3003"
+      BACKEND_PATH: "/"
     depends_on:
       - server
       - database
