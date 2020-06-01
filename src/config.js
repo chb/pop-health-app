@@ -5,7 +5,7 @@
 // from .env.development
 
 // In Docker these are coming from window.BACKEND_HOST and window.BACKEND_PATH,
-// which are set in env.js file. Docker will rin envsubst on that file to set
+// which are set in env.js file. Docker will run `envsubst` on that file to set
 // these to its environment variables
 
 let BACKEND_HOST = String(window.BACKEND_HOST || "");
