@@ -21,12 +21,29 @@ cd pop-health-app
 npm i
 ```
 
-Then you can run it in development mode using `npm start` or create a production build
-that can be served by a web server using `npm run build`.
+## Build
+```sh
+npm run build
+```
 
-Note that this app requires a dedicated backend that should be installed separately from
-https://github.com/chb/pop-health-app-server. Alternatively, you can use Docker (see below)
-to run both the front-end, backend and a sample database server.
+## Start
+```sh
+npm run start:server`
+```
+
+Note that this app connects to external MySQL database. Alternatively, you can use Docker
+(see below) to run both the app, and a sample database server.
+
+## Environment Variables
+- `HOST` - The host on which the app is available. Defaults to `0.0.0.0`.
+- `PORT` - The port on which the app is available. Defaults to `8080`.
+- `DB_HOST` - The database host. Defaults to `localhost`.
+- `DB_USER` - The database user.
+- `DB_PASS` - The database user password.
+- `DB_SCHEMA` - The database schema.
+- `DB_WAIT_FOR_CONNECTION` - Whether to wait until a connection is available. Set to `"false"` to turn that off.
+- `DB_CONNECTION_LIMIT` - Max number of active connections in the pool. Defaults to `10`.
+- `DB_QUEUE_LIMIT` - How many connections can wait in the queue. Set to `0` for no limit. Defaults to `0`.
 
 ## Docker
 To run the project in a docker container that will also set up the back-end service and

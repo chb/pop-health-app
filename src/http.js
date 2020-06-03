@@ -1,14 +1,10 @@
 // This file contains the functions for communication with the backend.
-import config from "./config"
 
 const { location, fetch } = window;
 
-const backendUrl = new URL(
-    `${location.protocol}//${config.backendHost}${config.backendPath}`
-);
 
 function http(uri, options) {
-    const url = new URL(uri, backendUrl);
+    const url = new URL(uri, location.origin);
     return fetch(url.href, {
         mode: "cors",
         credentials: "include",

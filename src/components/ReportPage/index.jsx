@@ -273,6 +273,7 @@ class ReportPage extends React.Component
                         <Route path="/report/editor" exact render={() => this.renderEditor()} />
                         <br/>
                         <br/>
+                        <div style={{ minHeight: 474 }}>
                         {
                             prestoLoading ?
                                 <div className="alert alert-info">Loading...</div> :
@@ -284,6 +285,7 @@ class ReportPage extends React.Component
                                             <DataGrid data={ prestoData } query={query}/> :
                                             <div className="alert alert-info">No data to display</div>
                         }
+                        </div>
                         <br/>
                         <br/>
                     </div>

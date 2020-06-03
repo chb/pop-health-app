@@ -1,14 +1,16 @@
 version: '3.2'
 services:
-  
-  server:
+
+  pop-health-app:
     build:
-      context: https://github.com/chb/pop-health-app-server.git
+      context: ..
+      dockerfile: ./docker/Dockerfile
     ports:
-      - "3003:3003"
+      - "8080:8080"
     environment:
       HOST: "0.0.0.0"
-      PORT: "3003"
+      PORT: "8080"
+      REACT_APP_START_YEAR: 2016
       DB_HOST: database
       DB_USER: "bulk-data-read-only-user"
       DB_PASS: "bulk-data-read-only-user-password"
@@ -16,22 +18,10 @@ services:
       DB_WAIT_FOR_CONNECTION: "true"
       DB_CONNECTION_LIMIT: 10
       DB_QUEUE_LIMIT: 0
-      NO_SQL_AUTH: 1
     depends_on:
       - database
-
-  app:
-    build:
-      context: ..
-      dockerfile: ./docker/Dockerfile
-    ports:
-      - "8080:80"
-    environment:
-      BACKEND_HOST: "0.0.0.0:3003"
-      BACKEND_PATH: "/"
-    depends_on:
-      - server
-      - database
+    volumes:
+      - "../server:/app/server"
 
   database:
     image: mysql

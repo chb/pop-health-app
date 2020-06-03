@@ -1,6 +1,17 @@
-FROM nginx:alpine
+FROM node:12
 
-COPY ./build /usr/share/nginx/html
-COPY ./docker/nginx.conf /etc/nginx/nginx.conf
-EXPOSE 80
-CMD ["sh", "-c", "envsubst < /usr/share/nginx/html/env.js.tpl > /usr/share/nginx/html/env.js && nginx -g 'daemon off;'"]
+WORKDIR /app
+
+COPY package.json      /tmp/package.json
+COPY package-lock.json /tmp/package-lock.json
+
+RUN cd /tmp && npm install
+RUN mv /tmp/node_modules /app/node_modules
+
+COPY . .
+
+RUN cd /app && npm run build
+
+EXPOSE 3003
+
+CMD ["node", "./server/index.js"]
