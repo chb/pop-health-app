@@ -28,7 +28,7 @@ npm run build
 
 ## Start
 ```sh
-npm start`
+npm start
 ```
 
 Note that this app connects to external MySQL database. Alternatively, you can use Docker
