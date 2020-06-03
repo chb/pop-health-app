@@ -35,6 +35,9 @@ Note that this app connects to external MySQL database. Alternatively, you can u
 (see below) to run both the app, and a sample database server.
 
 ## Environment Variables
+The app is configured via environment variables. These should be set in a `.env` file
+located in the project root folder (this file is not included in the git repository so
+you must create it yourself). The environment variables include:
 - `HOST` - The host on which the app is available. Defaults to `0.0.0.0`.
 - `PORT` - The port on which the app is available. Defaults to `8080`.
 - `DB_HOST` - The database host. Defaults to `localhost`.
