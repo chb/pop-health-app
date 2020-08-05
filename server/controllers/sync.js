@@ -24,6 +24,14 @@ const vaccineCodes = [
 // LOINC Code for blood pressure that we use
 const bpCode = "55284-4";
 
+function randomInt(min = 0, max = 1)
+{
+    if (max < min) {
+        max = min;
+    }
+    return min + Math.round(Math.random() * (max - min));
+}
+
 /**
  * Fetch results for the hypertension quality measure. This function needs to be
  * called once for each year, organization and dataset
@@ -220,6 +228,47 @@ async function syncImmunizationsForAdolescents(year, orgId, dsId)
     await Promise.all(tasks);
 }
 
+async function syncPRO(year, orgId, dsId)
+{
+    // How many patients from this dataset and this organization completed
+    // the survey within the given month
+    let DENOMINATOR = randomInt(30, 60);
+
+    let NUMERATORS = [
+        randomInt(10, 90),
+        randomInt(10, 90),
+        randomInt(10, 90),
+        randomInt(10, 90),
+        randomInt(10, 90),
+        randomInt(10, 90),
+        randomInt(10, 90),
+        randomInt(10, 90),
+        randomInt(10, 90),
+        randomInt(10, 90),
+        randomInt(10, 90),
+        randomInt(10, 90)
+    ];
+
+    console.log(NUMERATORS)
+
+    const tasks = NUMERATORS.map((numerator, index) => DB.promise(
+        "run",
+        "INSERT OR REPLACE INTO measure_results_2 (" +
+            "measure_id, date, numerator, denominator, org_id, ds_id" +
+        ") VALUES (?, ?, ?, ?, ?, ?)",
+        [
+            "pro",
+            `${year}-${index + 1 < 10 ? "0" + (index + 1) : index + 1 }-01`,
+            numerator,
+            DENOMINATOR,
+            orgId,
+            dsId
+        ]
+    ));
+
+    await Promise.all(tasks);
+}
+
 function *syncAllHypertensions(startDate, endDate)
 {
     yield syncHypertension(startDate.year(), "bch" , "bch_cerner");
@@ -252,15 +301,35 @@ function *syncAllImmunizationsForAdolescents(startDate, endDate)
     yield syncImmunizationsForAdolescents(endDate  .year(), "ppoc", "bch_epic"  );
 }
 
+function *syncAllPROs(startDate, endDate)
+{
+    yield syncPRO(startDate.year(), "bch" , "bch_cerner");
+    yield syncPRO(endDate  .year(), "bch" , "bch_cerner");
+    yield syncPRO(startDate.year(), "po"  , "bch_cerner");
+    yield syncPRO(endDate  .year(), "po"  , "bch_cerner");
+    yield syncPRO(startDate.year(), "ppoc", "bch_cerner");
+    yield syncPRO(endDate  .year(), "ppoc", "bch_cerner");
+    yield syncPRO(startDate.year(), "bch" , "bch_epic"  );
+    yield syncPRO(endDate  .year(), "bch" , "bch_epic"  );
+    yield syncPRO(startDate.year(), "po"  , "bch_epic"  );
+    yield syncPRO(endDate  .year(), "po"  , "bch_epic"  );
+    yield syncPRO(startDate.year(), "ppoc", "bch_epic"  );
+    yield syncPRO(endDate  .year(), "ppoc", "bch_epic"  );
+}
+
 async function syncAll(startDate, endDate)
 {
     let i = 0;
-    for await (const _ of syncAllImmunizationsForAdolescents(startDate, endDate)) {
-        console.log(`Synchronize immunizations: ${Math.round(++i/12 * 100)}%`);
-    }
-    i = 0;
-    for await (const _ of syncAllHypertensions(startDate, endDate)) {
-        console.log(`Synchronize hypertensions: ${Math.round(++i/12 * 100)}%`);
+    // for await (const _ of syncAllImmunizationsForAdolescents(startDate, endDate)) {
+    //     console.log(`Synchronize immunizations: ${Math.round(++i/12 * 100)}%`);
+    // }
+    // i = 0;
+    // for await (const _ of syncAllHypertensions(startDate, endDate)) {
+    //     console.log(`Synchronize hypertensions: ${Math.round(++i/12 * 100)}%`);
+    // }
+    // i = 0;
+    for await (const _ of syncAllPROs(startDate, endDate)) {
+        console.log(`Synchronize PROs: ${Math.round(++i/12 * 100)}%`);
     }
     console.log("Synchronization complete!");
 }

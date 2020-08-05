@@ -99,7 +99,9 @@ export class TimelineGrid extends React.Component
                 const dateObject = moment(date);
 
                 const title = `${dateObject.format("MMM YYYY")} - ${entry.numerator} of ${entry.denominator}`;
-                const pct = Math.round(entry.pct);
+                // const pct = Math.round(entry.pct);
+
+                const value = measure.id == "pro" ? entry.numerator : Math.round(entry.pct) + "%";
 
                 const query = new URLSearchParams();
                 query.set("date", dateObject.format("YYYY-MM-DD"));
@@ -116,7 +118,7 @@ export class TimelineGrid extends React.Component
                 if (dateObject.isSame(now, "year")) {
                     cells[i % 12] = (
                         <td key={date} title={title}>
-                            <Link to={`/report?${query}`}>{ Math.round(pct) }%</Link>
+                            <Link to={`/report?${query}`}>{ value }</Link>
                         </td>
                     );
                 }
@@ -128,7 +130,7 @@ export class TimelineGrid extends React.Component
                     if (!measure.data[newDate]) {
                         cells[i % 12] = (
                             <td key={date} title={title}>
-                                <Link to={`/report?${query}`} className="text-muted">{ Math.round(pct) }%</Link>
+                                <Link to={`/report?${query}`} className="text-muted">{ value }</Link>
                             </td>
                         );
                     }
