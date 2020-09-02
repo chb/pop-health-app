@@ -111,6 +111,8 @@ class MeasureResult
         const results = await DB.promise(
             "all",
 
+            // SUM(mr.numerator) AS numerator,
+            // (CASE ("mr.numerator") WHEN mr.measure_id = "pro" THEN AVG(mr.numerator)/ds.length ||1 ELSE SUM(mr.numerator) END) AS numerator,
             `SELECT
                 mr.id,
                 mr.org_id,
@@ -150,7 +152,7 @@ class MeasureResult
                     if (rec.org_id === org.id && rec.measure_id === measure.id) {
                         const key = rec.date.replace(/-\d\d$/, "");
                         data[key] = {
-                            numerator: rec.numerator,
+                            numerator: measure.id === "pro" ? Math.round(rec.numerator / (dsParams.length || 1)) : rec.numerator,
                             denominator: rec.denominator,
                             pct: lib.roundToPrecision(rec.numerator / rec.denominator * 100, 2),
                             id: rec.id
@@ -185,6 +187,7 @@ class MeasureResult
                 "mr.date             AS measureDate, " +
                 "m.name              AS measureName, " +
                 "SUM(mr.numerator)   AS numeratorValue, " +
+                (measure === "pro" ? "AVG(mr.numerator) AS numeratorValue, " : "SUM(mr.numerator) AS numeratorValue, ") +
                 "SUM(mr.denominator) AS denominatorValue, " +
                 "m.description       AS measureDescription, " +
                 "m.numerator         AS numeratorDescription, " +

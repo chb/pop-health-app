@@ -28,8 +28,13 @@ npm run build
 
 ## Start
 ```sh
+npm run build
 npm start
 ```
+
+To use this for local development:
+1. Run `PORT=8081 npm start`
+2. In separate terminal run `npm run start:app`
 
 Note that this app connects to external MySQL database. Alternatively, you can use Docker
 (see below) to run both the app, and a sample database server.

@@ -151,47 +151,81 @@ class MeasuresPage extends React.Component
     }
 
     getChartOptions(orgData, measure) {
-        const series = [
-            {
-                data : [],
-                id   : "current_year",
-                name : config.startYear + 1,
-                xAxis: "year_axis"
-            },
-            {
-                data : [],
-                id   : "previous_year",
-                name : config.startYear,
-                xAxis: "year_axis"
-            }
-        ];
-
-        Object.keys(measure.data).forEach(key => {
-            const [ year, month ] = key.split("-");
-            const rec = measure.data[key];
-            const point = {
-                x: parseInt(month, 10) - 1,
-                y: rec.pct,
-                name : moment(key).format("MMMM"),
-                xAxis: 0
-            };
-            if (year === String(config.startYear + 1)) {
-                series[0].data.push(point);
-            }
-            else if (year === String(config.startYear)) {
-                series[1].data.push(point);
-            }
-        });
-
-        return {
+        const options = {
             title: {
                 text: measure.name
             },
             subtitle: {
                 text: orgData.description
             },
-            series
+            series: [
+                {
+                    data : [],
+                    id   : "current_year",
+                    name : config.startYear + 1,
+                    xAxis: "year_axis"
+                },
+                {
+                    data : [],
+                    id   : "previous_year",
+                    name : config.startYear,
+                    xAxis: "year_axis"
+                }
+            ],
+            yAxis: {
+                title: {
+                    text: "% Patients"
+                }
+            }
         };
+
+        if (measure.id === "pro") {
+            Object.keys(measure.data).forEach(key => {
+                const [ year, month ] = key.split("-");
+                const rec = measure.data[key];
+                const point = {
+                    x: parseInt(month, 10) - 1,
+                    y: rec.numerator,
+                    name : moment(key).format("MMMM"),
+                    xAxis: 0
+                };
+                if (year === String(config.startYear + 1)) {
+                    options.series[0].data.push(point);
+                }
+                else if (year === String(config.startYear)) {
+                    options.series[1].data.push(point);
+                }
+            });
+
+            options.tooltip = {
+                headerFormat : "<b>{point.key} - Average T-Score</b><hr style=\"margin: 2px 0\"/><table>",
+                pointFormat  : "<tr><td style=\"color: {series.color}; text-align: right\">{series.name}: </td>" +
+                    "<td style=\"text-align: right\"><b>&nbsp;{point.y}</b></td></tr>",
+                valueDecimals: 0
+            };
+
+            options.yAxis.title.text = "Avg. T-Score";
+        }
+        else {
+            Object.keys(measure.data).forEach(key => {
+                const [ year, month ] = key.split("-");
+                const rec = measure.data[key];
+                const point = {
+                    x: parseInt(month, 10) - 1,
+                    y: rec.pct,
+                    name : moment(key).format("MMMM"),
+                    xAxis: 0
+                };
+                if (year === String(config.startYear + 1)) {
+                    options.series[0].data.push(point);
+                }
+                else if (year === String(config.startYear)) {
+                    options.series[1].data.push(point);
+                }
+            });
+        }
+
+        return options;
     }
 
     // Event Handlers ----------------------------------------------------------

@@ -98,11 +98,18 @@ export class TimelineGrid extends React.Component
                 const entry      = measure.data[date];
                 const dateObject = moment(date);
 
-                const title = `${dateObject.format("MMM YYYY")} - ${entry.numerator} of ${entry.denominator}`;
-                // const pct = Math.round(entry.pct);
+                let title = dateObject.format("MMM YYYY");
+                let value;
 
-                const value = measure.id == "pro" ? entry.numerator : Math.round(entry.pct) + "%";
-
+                if (measure.id === "pro") {
+                    title += ` - Average T-Score of ${entry.numerator} from ${entry.denominator} patients`;
+                    value = entry.numerator;
+                }
+                else {
+                    title += ` - ${entry.numerator} of ${entry.denominator} patients`;
+                    value = Math.round(entry.pct);
+                }
+ 
                 const query = new URLSearchParams();
                 query.set("date", dateObject.format("YYYY-MM-DD"));
                 query.set("measure", measure.id);
@@ -170,7 +177,7 @@ export class TimelineGrid extends React.Component
                         }
                     }
                 >
-                    <th>{ measure.name }</th>
+                    <th>{ measure.name } ({ measure.id === "pro" ? "T-Score" : "%"})</th>
                     { cells }
                 </tr>
             );

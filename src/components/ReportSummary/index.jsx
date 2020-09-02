@@ -2,6 +2,7 @@ import React     from "react";
 import moment    from "moment";
 import PropTypes from "prop-types";
 import Chart     from "../Chart";
+import PROChart  from "../Chart/PROChart";
 import                "./ReportSummary.scss";
 
 export default class ReportSummary extends React.Component
@@ -14,7 +15,8 @@ export default class ReportSummary extends React.Component
         denominatorValue      : PropTypes.number,
         measureDescription    : PropTypes.string,
         numeratorDescription  : PropTypes.string,
-        denominatorDescription: PropTypes.string
+        denominatorDescription: PropTypes.string,
+        measureId             : PropTypes.string
     };
 
     render()
@@ -27,7 +29,8 @@ export default class ReportSummary extends React.Component
             denominatorValue,
             measureDescription,
             numeratorDescription,
-            denominatorDescription
+            denominatorDescription,
+            measureId
         } = this.props;
 
 
@@ -39,16 +42,18 @@ export default class ReportSummary extends React.Component
                         <div className="title">{ measureName }</div>
                     </div>
                     <div className="col">
-                        <Chart
-                            numerator={ numeratorValue }
-                            denominator={ denominatorValue }
-                        />
+                        {
+                            measureId === "pro" ?
+                            <PROChart numerator={ numeratorValue } denominator={ denominatorValue } /> :
+                            <Chart numerator={ numeratorValue } denominator={ denominatorValue } />
+                        }
                     </div>
                 </div>
                 <div className="row">
                     <div className="col">
                         <p className="sub-title">POPULATION HEALTH IMPACT</p>
-                        <p>{ measureDescription }</p>
+                        <div dangerouslySetInnerHTML={{ __html: measureDescription }}></div>
+                        <br/>
                     </div>
                 </div>
                 <br/>

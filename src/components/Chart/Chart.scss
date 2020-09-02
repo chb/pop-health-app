@@ -3,7 +3,7 @@
 svg.chart {
     
     .chart-big-text {
-        font-size  : 45px;
+        font-size  : 46px;
         font-weight: 500;
         fill       : #000;
         text-anchor: middle;
@@ -11,6 +11,12 @@ svg.chart {
 
     .chart-small-text {
         font-size  : 22px;
+        fill       : $colorGray6;
+        text-anchor: middle;
+    }
+
+    .chart-smaller-text {
+        font-size  : 14px;
         fill       : $colorGray6;
         text-anchor: middle;
     }
@@ -24,6 +30,24 @@ svg.chart {
     .chart-arc-bg {
         fill: none;
         stroke: $colorGray4;
+        stroke-width: 20px;
+    }
+
+    .chart-arc-normal {
+        fill: none;
+        stroke: $colorBrand;
+        stroke-width: 20px;
+    }
+
+    .chart-arc-severe {
+        fill: none;
+        stroke: rgb(255, 170, 0);
+        stroke-width: 20px;
+    }
+
+    .chart-arc-very-severe {
+        fill: none;
+        stroke: rgb(255, 94, 0);
         stroke-width: 20px;
     }
 }

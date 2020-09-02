@@ -117,7 +117,13 @@ class ReportPage extends React.Component
         this.setState({ loading: true }, () => {
             http.request(`api/measure/result/report?${query}`).then(
                 data  => {
-                    this.setState({ data, loading: false })
+                    this.setState({
+                        data: {
+                            ...data,
+                            measureId: query.get("measure")
+                        },
+                        loading: false
+                    });
                     if (data.cohort_sql) {
                         this.runQuery(data.cohort_sql)
                     }
@@ -217,6 +223,7 @@ class ReportPage extends React.Component
             <ReportSummary
                 clinic="All Clinics"
                 date={ this.state.data.measureDate }
+                measureId={ this.state.data.measureId }
                 measureName={ this.state.data.measureName }
                 startValue={ this.state.numeratorValue }
                 numeratorValue={ this.state.data.numeratorValue }
