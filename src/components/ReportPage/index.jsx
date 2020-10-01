@@ -193,7 +193,7 @@ class ReportPage extends React.Component
             return null;
         }
 
-        const { queryTime, prestoLoading, prestoData } = this.state;
+        const { queryTime, prestoLoading, prestoData, prestoError, query } = this.state;
 
         return (
             <>
@@ -211,6 +211,20 @@ class ReportPage extends React.Component
                     </div> :
                     null
             }
+            <br/>
+            <div style={{ minHeight: 474 }}>
+            {
+                prestoLoading ?
+                    <div className="alert alert-info">Loading...</div> :
+                    prestoError ?
+                        <div className="alert alert-danger">{ prestoError.message }</div> :
+                        prestoData === undefined ?
+                            null :
+                            prestoData && prestoData.data && prestoData.data.length ?
+                                <DataGrid data={ prestoData } query={query}/> :
+                                <div className="alert alert-info">No data to display</div>
+            }
+            </div>
             </>
         );
     }
@@ -237,13 +251,7 @@ class ReportPage extends React.Component
 
     render()
     {
-        const {
-            error,
-            prestoError,
-            prestoData,
-            prestoLoading,
-            query
-        } = this.state;
+        const { error } = this.state;
 
         if ( error ) {
             console.error(error);
@@ -278,21 +286,6 @@ class ReportPage extends React.Component
                         <br/>
                         <Route path="/report"        exact render={() => this.createSummaryRenderer()}/>
                         <Route path="/report/editor" exact render={() => this.renderEditor()} />
-                        <br/>
-                        <br/>
-                        <div style={{ minHeight: 474 }}>
-                        {
-                            prestoLoading ?
-                                <div className="alert alert-info">Loading...</div> :
-                                prestoError ?
-                                    <div className="alert alert-danger">{ prestoError.message }</div> :
-                                    prestoData === undefined ?
-                                        null :
-                                        prestoData && prestoData.data && prestoData.data.length ?
-                                            <DataGrid data={ prestoData } query={query}/> :
-                                            <div className="alert alert-info">No data to display</div>
-                        }
-                        </div>
                         <br/>
                         <br/>
                     </div>
