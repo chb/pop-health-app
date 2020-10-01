@@ -11,15 +11,15 @@
       background: #EEE;
       th {
         line-height: normal;
-        color: $colorGray6;
-        text-align: center;
+        color      : $colorGray6;
+        text-align : center;
         font-weight: 400;
-        font-size: small;
-        width: 40px;
-        border-top: 0;
+        font-size  : small;
+        width      : 40px;
+        border-top : 0;
 
         &:first-child {
-          width: 140px;
+          width       : 280px;
           border-right: 1px solid #DDD;
         }
       }
@@ -29,15 +29,14 @@
       background: #FFF;
 
       th {
-        font-size   : small;
-        font-weight : 500;
-        line-height : normal;
-        width       : 140px;
-        padding     : 0.5rem 0.3rem;
-        border-right: 1px solid #DDD;
-        cursor      : default;
-        height      : 49px;
+        font-size     : small;
+        font-weight   : 400;
+        line-height   : normal;
+        padding       : 0.6rem 0.3rem;
+        border-right  : 1px solid #DDD;
+        cursor        : default;
         vertical-align: middle;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
       }
     }
   
@@ -60,7 +59,7 @@
         bottom: 3px;
         text-align    : center;
         vertical-align: middle;
-        line-height   : 3.3em;
+        line-height   : 2.2em;
         color         : $colorGray6;
         border-radius : 3px;
 
