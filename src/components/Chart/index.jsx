@@ -37,8 +37,8 @@ export default class Chart extends React.Component
                 {
                     duration: this.props.duration,
                     easing  : this.props.easing,
-                    step: (now, tween) => this.setState({ [tween.prop]: now }),
-                    complete: () => this.setState({ animating: false })
+                    step: (now, tween) => { if (!this._unmounted) this.setState({ [tween.prop]: now }) },
+                    complete: () => { if (!this._unmounted) this.setState({ animating: false }) }
                 }
             );
         });
@@ -58,12 +58,16 @@ export default class Chart extends React.Component
                     {
                         duration: this.props.duration,
                         easing  : this.props.easing,
-                        step: (now, tween) => this.setState({ [tween.prop]: now }),
-                        complete: () => this.setState({ animating: false })
+                        step: (now, tween) => { if (!this._unmounted) this.setState({ [tween.prop]: now }) },
+                        complete: () => { if (!this._unmounted) this.setState({ animating: false }) }
                     }
                 );
             });
         }
+    }
+
+    componentWillUnmount() {
+        this._unmounted = true;
     }
 
     render() {
@@ -72,12 +76,6 @@ export default class Chart extends React.Component
         const [x, y] = getCoordinatesForPercent(percent / 100);
         return (
             <svg className="chart" viewBox="-110 -110 220 220">
-                <defs>
-                    <linearGradient id="myGradient" gradientTransform="rotate(90)">
-                    <stop offset="5%"  stop-color="gold" />
-                    <stop offset="95%" stop-color="red" />
-                    </linearGradient>
-                </defs>
                 <text className="chart-big-text" y={0}>{Math.round(percent)}%</text>
                 {
                     <text className="chart-small-text" y={35}>
@@ -88,7 +86,7 @@ export default class Chart extends React.Component
                     percent === 0 ?
                         <circle cx={0} cy={0} r={100} className="chart-arc-bg"/> :
                         <g style={{ transform: "rotate(-0.25turn)" }}>
-                            <path fill="url('#myGradient')" className="chart-arc-main" d={`M 100 0 A 100 100 0 ${largeArcFlag} 1 ${x} ${y}`}/>
+                            <path className="chart-arc-main" d={`M 100 0 A 100 100 0 ${largeArcFlag} 1 ${x} ${y}`}/>
                             <path className="chart-arc-bg" d={`M ${x} ${y} A 100 100 0 ${largeArcFlag ? 0 : 1 } 1 100 0`}/>
                         </g>
                 }

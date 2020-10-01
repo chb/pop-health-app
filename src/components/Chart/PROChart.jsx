@@ -37,8 +37,8 @@ export default class PROChart extends React.Component
                 {
                     duration: this.props.duration,
                     easing  : this.props.easing,
-                    step: (now, tween) => this.setState({ [tween.prop]: Math.round(now) }),
-                    complete: () => this.setState({ animating: false })
+                    step: (now, tween) => { if (!this._unmounted) this.setState({ [tween.prop]: Math.round(now) }) },
+                    complete: () => { if (!this._unmounted) this.setState({ animating: false }) }
                 }
             );
         });
@@ -58,12 +58,16 @@ export default class PROChart extends React.Component
                     {
                         duration: 200,
                         easing  : "linear",
-                        step: (now, tween) => this.setState({ [tween.prop]: Math.round(now) }),
-                        complete: () => this.setState({ animating: false })
+                        step: (now, tween) => { if (!this._unmounted) this.setState({ [tween.prop]: Math.round(now) }) },
+                        complete: () => { if (!this._unmounted) this.setState({ animating: false }) }
                     }
                 );
             });
         }
+    }
+
+    componentWillUnmount() {
+        this._unmounted = true;
     }
 
     render() {
@@ -96,6 +100,7 @@ export default class PROChart extends React.Component
                 <path
                     className={ section.className }
                     d={ `M ${startX} ${startY} A 100 100 0 ${largeArcFlag} 1 ${endX} ${endY}` }
+                    key={`zone-${i}`}
                 />
             );
         });
