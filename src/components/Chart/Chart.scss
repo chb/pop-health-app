@@ -35,19 +35,32 @@ svg.chart {
 
     .chart-arc-normal {
         fill: none;
-        stroke: $colorBrand;
+        // stroke: $colorBrand;
+        stroke: rgb(74, 144, 226);
+        stroke-width: 20px;
+    }
+    
+    .chart-arc-mild {
+        fill: none;
+        stroke: rgb(124, 124, 176);
+        stroke-width: 20px;
+    }
+    
+    .chart-arc-moderate {
+        fill: none;
+        stroke: rgb(174, 104, 126);
+        stroke-width: 20px;
+    }
+
+    .chart-arc-moderately-severe {
+        fill: none;
+        stroke: rgb(224, 84, 76);
         stroke-width: 20px;
     }
 
     .chart-arc-severe {
         fill: none;
-        stroke: rgb(255, 170, 0);
-        stroke-width: 20px;
-    }
-
-    .chart-arc-very-severe {
-        fill: none;
-        stroke: rgb(255, 94, 0);
+        stroke: rgb(255, 64, 26);
         stroke-width: 20px;
     }
 }

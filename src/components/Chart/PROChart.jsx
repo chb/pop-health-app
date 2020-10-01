@@ -70,10 +70,11 @@ export default class PROChart extends React.Component
         const score = this.state.numerator;
 
         const zones = [
-            { min: 10, max: 30, className: "chart-arc-normal"      },
-            { min: 30, max: 70, className: "chart-arc-normal"      },
-            { min: 70, max: 85, className: "chart-arc-severe"      },
-            { min: 85, max: 90, className: "chart-arc-very-severe" }
+            { min: 10, max: 55, className: "chart-arc-normal"            },
+            { min: 55, max: 60, className: "chart-arc-mild"              },
+            { min: 60, max: 65, className: "chart-arc-moderate"          },
+            { min: 65, max: 70, className: "chart-arc-moderately-severe" },
+            { min: 70, max: 90, className: "chart-arc-severe"            }
         ].map((section, i, all) => {
             let startPct = section.min / 100;
             let endPct   = section.max / 100;
