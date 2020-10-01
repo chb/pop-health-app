@@ -253,7 +253,7 @@ class ReportPage extends React.Component
         return (
             <div>
                 <div className="row">
-                    <Sidebar/>
+                    <Sidebar disableOrganizations/>
                     <div className="col-9">
                         <div className="row">
                             <div className="col-6 align-middle">

@@ -7,7 +7,7 @@ export default class Sidebar extends React.Component
     render() {
         return (
             <div className="col-3 app-sidebar">
-                <DataSourceSelector/>
+                <DataSourceSelector disableOrganizations={ this.props.disableOrganizations }/>
             </div>
         );
     }

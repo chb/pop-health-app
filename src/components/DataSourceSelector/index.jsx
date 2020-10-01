@@ -9,15 +9,22 @@ import                           "./DataSourceSelector.css";
 class Sidebar extends React.Component
 {
     static propTypes = {
-        dataSources     : PropTypes.object.isRequired,
-        toggleDataSource: PropTypes.func.isRequired,
-        toggleOrg       : PropTypes.func.isRequired,
-        organizations   : PropTypes.array.isRequired
+        dataSources         : PropTypes.object.isRequired,
+        toggleDataSource    : PropTypes.func.isRequired,
+        toggleOrg           : PropTypes.func.isRequired,
+        organizations       : PropTypes.array.isRequired,
+        disableOrganizations: PropTypes.bool
     };
 
     render()
     {
-        const { dataSources, organizations, toggleDataSource, toggleOrg } = this.props;
+        const {
+            dataSources,
+            organizations,
+            toggleDataSource,
+            toggleOrg,
+            disableOrganizations
+        } = this.props;
 
         const ehr = Object.keys(dataSources)
             .filter(id => dataSources[id].type === "ehr")
@@ -35,7 +42,7 @@ class Sidebar extends React.Component
                             title={ o.description }
                             checked={ !!o.selected }
                             onChange={ () => toggleOrg(o.value) }
-                            disabled={ o.selected && organizations.filter(o => o.selected).length < 2 }
+                            disabled={ !!disableOrganizations || (o.selected && organizations.filter(o => o.selected).length < 2) }
                         />
                     ))
                 }
