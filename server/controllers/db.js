@@ -1,6 +1,9 @@
 const sqlite3 = require("sqlite3");
 const debug   = require("debug")("DB");
 
+/**
+ * @type {*}
+ */
 const DB = new sqlite3.Database(`${__dirname}/../database.db`);
 
 /**

@@ -32,6 +32,22 @@ function randomInt(min = 0, max = 1)
     return min + Math.round(Math.random() * (max - min));
 }
 
+function randomEntry(arr)
+{
+    return arr[randomInt(0, arr.length - 1)];
+}
+
+function randomOrg()
+{
+    return randomEntry(["bch", "po", "ppoc"]);
+}
+
+function randomDataset()
+{
+    return randomEntry(["bch_cerner", "bch_epic"]);
+
+}
+
 /**
  * Fetch results for the hypertension quality measure. This function needs to be
  * called once for each year, organization and dataset
@@ -228,43 +244,93 @@ async function syncImmunizationsForAdolescents(year, orgId, dsId)
     await Promise.all(tasks);
 }
 
+/**
+ * Fetch results from PROMIS QuestionnaireResponses. Note that we only have a
+ * few of those in our DB and they are in the 2017-2018 interval. To hack around
+ * that, we increment the year (which should be 2016 or 2017) before selecting.
+ * This function needs to be called once for each year, organization and dataset
+ * @param {number} year 4 digit year 
+ * @param {string} orgId Organization ID: "bch" | "po" | "ppoc"
+ * @param {*} dsId Dataset ID: "bch_cerner" | "bch_epic"
+ */
 async function syncPRO(year, orgId, dsId)
 {
-    // How many patients from this dataset and this organization completed
-    // the survey within the given month
-    let DENOMINATOR = randomInt(30, 60);
+    const startDate = `${year + 1}-01-01`;
+    const endDate   = `${year + 1}-12-31`;
+    const url = "https://mss.fsm.northwestern.edu/ac_api/2018-10/Questionnaire/96FE494D-F176-4EFB-A473-2AB406610626";
 
-    let NUMERATORS = [
-        randomInt(10, 90),
-        randomInt(10, 90),
-        randomInt(10, 90),
-        randomInt(10, 90),
-        randomInt(10, 90),
-        randomInt(10, 90),
-        randomInt(10, 90),
-        randomInt(10, 90),
-        randomInt(10, 90),
-        randomInt(10, 90),
-        randomInt(10, 90),
-        randomInt(10, 90)
-    ];
+    // Patients who filed a response to the PROMIS questionnaire within the
+    // selected year
+    let sql = `SELECT
+        qr.resource_json ->> '$.authored'  AS authored,
+        qr.resource_json ->> '$.extension' AS ext
+    
+    FROM QuestionnaireResponse AS qr
+    JOIN Questionnaire AS q ON (qr.resource_json ->> '$.questionnaire.reference' = CONCAT('Questionnaire/', q.resource_id))
+    WHERE
+        q.resource_json -> '$.url' = '${url}'
+    AND
+      DATE(qr.resource_json ->> '$.authored') >= DATE('${startDate}')
+    AND
+      DATE(qr.resource_json ->> '$.authored') <= DATE('${endDate}')
+    AND 
+      qr.resource_json -> '$.extension' LIKE '%tscore%'`;
 
-    console.log(NUMERATORS)
+    
+    // Execute query
+    const [rows] = await pool.query(sql);
 
-    const tasks = NUMERATORS.map((numerator, index) => DB.promise(
-        "run",
-        "INSERT OR REPLACE INTO measure_results_2 (" +
-            "measure_id, date, numerator, denominator, org_id, ds_id" +
-        ") VALUES (?, ?, ?, ?, ?, ?)",
-        [
-            "pro",
-            `${year}-${index + 1 < 10 ? "0" + (index + 1) : index + 1 }-01`,
-            numerator,
-            DENOMINATOR,
-            orgId,
-            dsId
-        ]
-    ));
+    // Average T-Score
+    let NUMERATORS = [];
+
+    rows.forEach(row => {
+
+        // This will have the same effect as if we have assigned random
+        // organization and dataset to each row and then we use them to filter
+        // to the selected orgId and dsId
+        if (randomOrg() != orgId || randomDataset() != dsId) return;
+
+        let month = moment(row.authored).month();
+
+        if (!NUMERATORS[month]) {
+            NUMERATORS[month] = { n: 0, d: 0 };
+        }
+
+        let ext = JSON.parse(row.ext || "[]");
+        
+        if (Array.isArray(ext)) {
+            let ext1 = ext.find(x => x.url == "http://hl7.org/fhir/StructureDefinition/questionnaire-scores");
+            if (ext1 && Array.isArray(ext1.extension)) {
+                let ext2 = ext1.extension.find(x => x.url == "tscore");
+                if (ext2 && ext2.hasOwnProperty("valueDecimal")) {
+                    NUMERATORS[month].n += ext2.valueDecimal;
+                    NUMERATORS[month].d += 1;
+                }
+            }
+        } 
+    });
+
+    const tasks = NUMERATORS.map((entry, index) => {
+
+        if (!entry) {
+            entry = { n: 0, d: 0 };
+        }
+
+        return DB.promise(
+            "run",
+            "INSERT OR REPLACE INTO measure_results_2 (" +
+                "measure_id, date, numerator, denominator, org_id, ds_id" +
+            ") VALUES (?, ?, ?, ?, ?, ?)",
+            [
+                "pro",
+                `${year}-${index + 1 < 10 ? "0" + (index + 1) : index + 1 }-01`,
+                Math.round(entry.n / (entry.d || 1)),
+                entry.d,
+                orgId,
+                dsId
+            ]
+        );
+    });
 
     await Promise.all(tasks);
 }
@@ -320,14 +386,14 @@ function *syncAllPROs(startDate, endDate)
 async function syncAll(startDate, endDate)
 {
     let i = 0;
-    // for await (const _ of syncAllImmunizationsForAdolescents(startDate, endDate)) {
-    //     console.log(`Synchronize immunizations: ${Math.round(++i/12 * 100)}%`);
-    // }
-    // i = 0;
-    // for await (const _ of syncAllHypertensions(startDate, endDate)) {
-    //     console.log(`Synchronize hypertensions: ${Math.round(++i/12 * 100)}%`);
-    // }
-    // i = 0;
+    for await (const _ of syncAllImmunizationsForAdolescents(startDate, endDate)) {
+        console.log(`Synchronize immunizations: ${Math.round(++i/12 * 100)}%`);
+    }
+    i = 0;
+    for await (const _ of syncAllHypertensions(startDate, endDate)) {
+        console.log(`Synchronize hypertensions: ${Math.round(++i/12 * 100)}%`);
+    }
+    i = 0;
     for await (const _ of syncAllPROs(startDate, endDate)) {
         console.log(`Synchronize PROs: ${Math.round(++i/12 * 100)}%`);
     }
