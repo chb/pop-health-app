@@ -41,8 +41,11 @@ Note that this app connects to external MySQL database. Alternatively, you can u
 
 ## Environment Variables
 The app is configured via environment variables. These should be set in a `.env` file
-located in the project root folder (this file is not included in the git repository so
-you must create it yourself). The environment variables include:
+located in the project root folder. This file is not included in the git repository so
+you must create it yourself. You can use the file `example.env` as a template.
+
+The environment variables include:
+- `REACT_APP_START_YEAR` - The app will render interval of two years. For example, if this is set to `2016`, then it will visualize data for 2016 and 2017.
 - `HOST` - The host on which the app is available. Defaults to `0.0.0.0`.
 - `PORT` - The port on which the app is available. Defaults to `8080`.
 - `DB_HOST` - The database host. Defaults to `localhost`.
