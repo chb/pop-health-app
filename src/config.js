@@ -1,3 +1,3 @@
 export default {
-    startYear: +(process.env.REACT_APP_START_YEAR || new Date().getFullYear() - 1)
+    startYear: +(process.env.REACT_APP_START_YEAR || 2016)
 };
