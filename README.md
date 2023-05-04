@@ -1,6 +1,8 @@
 # PopHealthApp
 The Pop-Health App of the LEAP Project 
 
+## ⚠️ This project was developed as a proof of concept. It is now deprecated and not maintained! 
+
 This is a sample React web application, designed to demonstrate what could be possible
 if we had a population level FHIR data available from EHRs through a bulk-data export.
 In this case we chose to create an app that visualizes data for quality measures.
